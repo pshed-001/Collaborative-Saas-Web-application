@@ -1,5 +1,5 @@
-import prisma from "../../config/prima";
-import { hashPassword } from "../../utils/hash";
+import prisma from "../../config/prima.js";
+import { hashPassword } from "../../utils/hash.js";
 
 // async function
 export async function registerUser(userInfo) {
@@ -14,16 +14,16 @@ export async function registerUser(userInfo) {
     throw error;
   } else {
     // hashing user password
-    const hashedPassword = hashPassword(userInfo.password);
+    const hashedPassword = await hashPassword(userInfo.password);
     // adding user to db
-    const user = prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         firstname: userInfo.firstname,
         lastname: userInfo.lastname,
         username: userInfo.username,
         email: userInfo.email,
         password: hashedPassword,
-      },
+      }
     });
     // return message of success
     return {
