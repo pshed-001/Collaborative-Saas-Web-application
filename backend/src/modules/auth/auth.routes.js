@@ -1,7 +1,10 @@
 import express from "express";
-import { validateRegisterUser, validateUserResult } from "./auth.validator.js";
-import { register } from "./auth.controller.js";
+import { validateRegisterUser, validateLogin, validateAuthResult } from "./auth.validator.js";
+import { register, login } from "./auth.controller.js";
 
-const router = express.Router()
-router.post("/", validateRegisterUser,validateUserResult,register)
-export default router;
+const authRouter = express.Router()
+authRouter.post("/register", validateRegisterUser,validateAuthResult,register)
+
+authRouter.post("/login",validateLogin,validateAuthResult,login )
+
+export default authRouter;
