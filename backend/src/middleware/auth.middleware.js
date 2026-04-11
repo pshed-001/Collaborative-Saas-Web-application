@@ -18,7 +18,8 @@ export const  authMiddleWare = (req, res, next) => {
         const verifiedToken = jwt.verify(token, JWT_ACCESS_SECRET_KEY )
         req.user = {
             id : verifiedToken.userId,
-            username : verifiedToken.username
+            username : verifiedToken.username,
+            roles : verifiedToken.roles || []
         }
         next()
     }catch(err){

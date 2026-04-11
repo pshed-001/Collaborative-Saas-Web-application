@@ -70,7 +70,7 @@ export async function loginUser(userInfo) {
   const refreshToken = jwt.sign(
     {
       userId: user.id,
-      username: user.username,
+      username: user.username
     },
     JWT_REFRESH_SECRET_KEY,
     { expiresIn: "24hr" },
