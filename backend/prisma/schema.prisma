@@ -12,7 +12,7 @@ datasource db {
   provider = "sqlite"
 }
 
-model user {
+model User {
   id String @id @default(uuid())
   firstname String
   lastname String
@@ -20,4 +20,49 @@ model user {
   email String @unique
   password String
   createdAt DateTime @default(now())
+  ownedWorkspaces Workspace[]
+  memberships Membership[]
+  createdTasks Task[] @relation("CreatedTasks")
+  assignedTasks Task[] @relation("AssignedTasks")
+  completedTasks Task[] @relation("CompletedTasks")
+}
+
+model Workspace{
+  id String @id @default(uuid())
+  name String
+  description String
+  mode String
+  category String
+  ownerId String
+  createdAt DateTime @default(now())
+  memberships Membership[]
+  tasks Task[]
+  owner User @relation(fields : [ownerId], references : [id])
+}
+
+model Membership{
+  id String @id @default(uuid())
+  userId String
+  workspaceId String
+  role String
+  status String
+  joinedAt DateTime @default(now())
+  user User @relation(fields : [userId], references : [id])
+  workspace Workspace @relation(fields : [workspaceId], references : [id])
+}
+
+model Task{
+  id String @id @default(uuid())
+  title String
+  description String
+  workspaceId String
+  createdAt DateTime @default(now())
+  createdById String
+  completedById String?
+  assignedToId String?
+  status String
+  workspace Workspace @relation(fields : [workspaceId], references : [id]) 
+  createdBy User @relation("CreatedTasks", fields : [createdById], references : [id])
+  completedBy User? @relation("CompletedTasks", fields : [completedById], references : [id])
+  assignedTo User? @relation("AssignedTasks", fields : [assignedToId], references : [id])
 }
