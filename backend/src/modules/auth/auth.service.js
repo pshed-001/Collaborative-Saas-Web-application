@@ -1,8 +1,33 @@
 import prisma from "../../config/prima.js";
 import { hashPassword, compareHash } from "../../utils/hash.js";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
-// async function
+const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
+  const accessToken = jwt.sign(
+    {
+      id: userInfo.id,
+      username: userInfo.username,
+    },
+    ACCESS_KEY,
+    { expiresIn: "15m" },
+  );
+  const refreshToken = jwt.sign(
+    {
+      id: userInfo.id,
+      username: userInfo.username,
+    },
+    REFRESH_KEY,
+    { expiresIn: "3d" },
+  );
+
+  return {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  };
+};
+
+// registering new user after collecting their credentials
 export async function registerUser(userInfo) {
   const checkExistingUser = await prisma.user.findUnique({
     where: { email: userInfo.email },
@@ -35,6 +60,7 @@ export async function registerUser(userInfo) {
   }
 }
 
+// Authenticating new user after providing credentials
 export async function loginUser(userInfo) {
   // querying db for matches
   const user = await prisma.user.findFirst({
@@ -56,25 +82,66 @@ export async function loginUser(userInfo) {
     throw error;
   }
   // getting secret keys form env file.
-  const JWT_ACCESS_SECRET_KEY = process.env.JWT_ACCESS_SECRET_KEY;
-  const JWT_REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET_KEY;
-  // generating token
-  const accessToken = jwt.sign(
-    {
-      userId: user.id,
-      username: user.username,
-    },
-    JWT_ACCESS_SECRET_KEY,
-    { expiresIn: "0.25hr" },
-  );
-  const refreshToken = jwt.sign(
-    {
-      userId: user.id,
-      username: user.username
-    },
-    JWT_REFRESH_SECRET_KEY,
-    { expiresIn: "24hr" },
-  );
-  // console.log(accessToken, refreshToken)
-  return { accessToken: accessToken, refreshToken: refreshToken };
+  const ACCESS_KEY = process.env.JWT_ACCESS_SECRET_KEY;
+  const REFRESH_KEY = process.env.JWT_REFRESH_SECRET_KEY;
+
+  return generateToken(ACCESS_KEY, REFRESH_KEY, user);
+}
+
+// verifying refresh token to generate new access token from /auth/refresh
+export async function verifyRefreshToken(refreshToken) {
+  if (!refreshToken) {
+    const error = new Error("No refresh token provided.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // getting keys for token
+  const ACCESS_KEY = process.env.JWT_ACCESS_SECRET_KEY;
+  const REFRESH_KEY = process.env.JWT_REFRESH_SECRET_KEY;
+
+  try {
+    const decoded = jwt.verify(refreshToken, REFRESH_KEY);
+    const accessToken = jwt.sign(
+      { id: decoded.id, username: decoded.username },
+      ACCESS_KEY,
+      { expiresIn: "15m" },
+    );
+    // returns access tokne
+    return { accessToken: accessToken };
+  } catch (err) {
+    // catching expired token error
+    if (err.name === "TokenExpiredError") {
+      const error = new Error("Access denied : Expired token . ");
+      error.statusCode = 401;
+      throw error;
+      // catching invalid token error
+    } else if (err.name === "JsonWebTokenError") {
+      const error = new Error("Access denied : Invalid token . ");
+      error.statusCode = 401;
+      throw error;
+      // catching all other errors apart from the ones above
+    } else {
+      const error = new Error("Something unexpected happened . ");
+      error.statusCode = 500;
+      throw error;
+    }
+  }
+}
+
+// logout user
+export async function logout(request, response) {
+  const refresh = request.cookies.refreshToken;
+  if (!refresh) {
+    const error = new Error("Cookie not present . ");
+    error.statusCode = 401;
+    throw error;
+  }
+  response.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/auth"
+  });
+  return { status: "successful", message: "Logged out successfully." };
 }

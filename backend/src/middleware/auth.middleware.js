@@ -4,20 +4,19 @@ import jwt from "jsonwebtoken";
 
 export const  authMiddleWare = (req, res, next) => {
     const checkAuthorised = req.headers.authorization;
-    if (!checkAuthorised || !checkAuthorised.startsWith("Bearer ")){
-        return errorMessage(res, "Authorization header not present.",401)
+    if (!checkAuthorised){
+        return errorMessage(res, "Access Denied : Invalid Token not present .", 401)
+    }
+    if (!checkAuthorised.startsWith("Bearer ")){
+        return errorMessage(res, "Access Denied : Invalid Token not valid(1) .", 401)
     }
 
     const JWT_ACCESS_SECRET_KEY = process.env.JWT_ACCESS_SECRET_KEY;
     const token = checkAuthorised.split(" ")[1];
-    // const verifiedToken = jwt.verify(checkAuthorised.split(" ")[1],JWT_ACCESS_SECRET_KEY )
-    /*if(!verifiedToken){
-        return errorMessage(res, "Incorrect token provided.", 401)
-    }*/
     try{
         const verifiedToken = jwt.verify(token, JWT_ACCESS_SECRET_KEY )
         req.user = {
-            id : verifiedToken.userId,
+            id : verifiedToken.id,
             username : verifiedToken.username,
             roles : verifiedToken.roles || []
         }
@@ -28,7 +27,7 @@ export const  authMiddleWare = (req, res, next) => {
             return errorMessage(res, "Expired Token", 401 )
 
         }else if(err.name === "JsonWebTokenError"){
-            return errorMessage(res, "Invalid token provided.", 401)
+            return errorMessage(res, "Access Denied : Invalid Token (2).", 401)
         }else{
             next(err)
         }
