@@ -2,6 +2,7 @@ import prisma from "../../config/prima.js";
 import { hashPassword, compareHash } from "../../utils/hash.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { AppError } from "../../middleware/apperror.js";
 
 const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
   const accessToken = jwt.sign(
@@ -21,10 +22,7 @@ const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
     { expiresIn: "3d" },
   );
 
-  return {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-  };
+  return { accessToken, refreshToken };
 };
 
 // registering new user after collecting their credentials
@@ -35,9 +33,7 @@ export async function registerUser(userInfo) {
   // checking if user already exists
   if (checkExistingUser) {
     // return error message
-    const error = new Error("User exists already.");
-    error.statusCode = 400;
-    throw error;
+    throw new AppError("User already exist", 400)
   } else {
     // hashing user password
     const hashedPassword = await hashPassword(userInfo.password);
@@ -53,9 +49,18 @@ export async function registerUser(userInfo) {
     });
     // return message of success
     return {
-      id: user.id,
-      username: user.username,
-      status: "User created successfully.",
+      error: false,
+      data: {
+        payload: {
+          id: user.id,
+          username: user.username,
+        },
+        meta: {
+          timestamp: new Date().toISOString()
+        }
+      },
+      message: "User created successfully.",
+      statusCode: 201
     };
   }
 }
@@ -70,30 +75,27 @@ export async function loginUser(userInfo) {
   });
 
   if (!user) {
-    const error = new Error("Invalid Credentials.");
-    error.statusCode = 401;
-    throw error;
+    throw new AppError("Invalid credentials", 401)
   }
   // comparing password hashes
   const verifyUser = await compareHash(userInfo.password, user.password);
   if (!verifyUser) {
-    const error = new Error("Invalid Credentials.");
-    error.statusCode = 401;
-    throw error;
+    throw new AppError("Invalid credentials", 401)
   }
   // getting secret keys form env file.
   const ACCESS_KEY = process.env.JWT_ACCESS_SECRET_KEY;
   const REFRESH_KEY = process.env.JWT_REFRESH_SECRET_KEY;
 
-  return generateToken(ACCESS_KEY, REFRESH_KEY, user);
-}
+  const result = generateToken(ACCESS_KEY, REFRESH_KEY, user);
+  return {
+    id: user.id, username: user.username, accessToken: result.accessToken, refreshToken: result.refreshToken, error: false, message: "Successfully logged in", statusCode: 200
 
+  }
+}
 // verifying refresh token to generate new access token from /auth/refresh
-export async function verifyRefreshToken(refreshToken) {
-  if (!refreshToken) {
-    const error = new Error("No refresh token provided.");
-    error.statusCode = 401;
-    throw error;
+export async function generateAccessToken(token) {
+  if (!token) {
+    throw new AppError("Unauthorised. Kindly login.", 401)
   }
 
   // getting keys for token
@@ -101,31 +103,40 @@ export async function verifyRefreshToken(refreshToken) {
   const REFRESH_KEY = process.env.JWT_REFRESH_SECRET_KEY;
 
   try {
-    const decoded = jwt.verify(refreshToken, REFRESH_KEY);
+    const decoded = jwt.verify(token, REFRESH_KEY);
     const accessToken = jwt.sign(
       { id: decoded.id, username: decoded.username },
       ACCESS_KEY,
       { expiresIn: "15m" },
     );
-    // returns access tokne
-    return { accessToken: accessToken };
+    // returns access token
+
+    // refresh token rotatrion
+    const refreshToken = jwt.sign(
+      { id: decoded.id, username: decoded.username },
+      REFRESH_KEY, { expiresIn: "3d" }
+    )
+    return {
+      id: decoded.id,
+      username: decoded.username,
+      accessToken,refreshToken,
+      error: false,
+      message: "Successfully generated token",
+      statusCode: 200,
+    }
   } catch (err) {
     // catching expired token error
     if (err.name === "TokenExpiredError") {
-      const error = new Error("Access denied : Expired token . ");
-      error.statusCode = 401;
-      throw error;
+      throw new AppError("Expired token", 403)
+
       // catching invalid token error
-    } else if (err.name === "JsonWebTokenError") {
-      const error = new Error("Access denied : Invalid token . ");
-      error.statusCode = 401;
-      throw error;
+    } if (err.name === "JsonWebTokenError") {
+      throw new AppError("Access denied", 401)
+
       // catching all other errors apart from the ones above
-    } else {
-      const error = new Error("Something unexpected happened . ");
-      error.statusCode = 500;
-      throw error;
     }
+    throw err;
+
   }
 }
 
@@ -133,9 +144,7 @@ export async function verifyRefreshToken(refreshToken) {
 export async function logout(request, response) {
   const refresh = request.cookies.refreshToken;
   if (!refresh) {
-    const error = new Error("Cookie not present . ");
-    error.statusCode = 401;
-    throw error;
+    throw new AppError("Kindly login first", 401)
   }
   response.clearCookie("refreshToken", {
     httpOnly: true,
@@ -143,5 +152,33 @@ export async function logout(request, response) {
     sameSite: "strict",
     path: "/auth"
   });
-  return { status: "successful", message: "Logged out successfully." };
+  return {
+    error: false,
+    data: {
+      payload: null,
+      meta: {
+        timestamp: new Date().toISOString()
+      }
+    },
+    message: "Successfully logged out",
+    statusCode: 200
+  };
 }
+
+// update table records
+export async function update() {
+  try {
+    const updateRecord = await prisma.user.update({
+      where: {
+        username: "dev2",
+      },
+      data: {
+        username: "dev2@itgel",
+      },
+    });
+    return updateRecord.username
+  } catch (err) {
+    throw err
+  }
+}
+

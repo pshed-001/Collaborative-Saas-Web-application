@@ -12,6 +12,26 @@ datasource db {
   provider = "sqlite"
 }
 
+enum WorkspaceMode{
+  PUBLIC @map("public")
+  PRIVATE @map("private")
+}
+
+enum MembershipStatus{
+  ACTIVE @map("active")
+  INACTIVE @map("inactive")
+  PENDING @map("pending")
+  REMOVED @map("removed")
+  LEFT @map("left")
+}
+
+enum MembershipRole{
+  ADMIN @map("admin")
+  MEMBER @map("member")
+}
+
+
+
 model User {
   id String @id @default(uuid())
   firstname String
@@ -29,26 +49,28 @@ model User {
 
 model Workspace{
   id String @id @default(uuid())
-  name String
+  name String 
   description String
-  mode String
+  mode WorkspaceMode @default(PUBLIC)
   category String
-  ownerId String
+  ownerId String 
   createdAt DateTime @default(now())
   memberships Membership[]
   tasks Task[]
   owner User @relation(fields : [ownerId], references : [id])
+  @@unique([name, ownerId])
 }
 
 model Membership{
   id String @id @default(uuid())
   userId String
-  workspaceId String
-  role String
-  status String
+  workspaceId String 
+  role MembershipRole @default(MEMBER)
+  status MembershipStatus @default(PENDING)
   joinedAt DateTime @default(now())
   user User @relation(fields : [userId], references : [id])
   workspace Workspace @relation(fields : [workspaceId], references : [id])
+  @@unique([userId, workspaceId])
 }
 
 model Task{
