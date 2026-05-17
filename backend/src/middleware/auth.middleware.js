@@ -2,7 +2,7 @@ import { errorMessage } from "../utils/helper.message.js";
 import jwt from "jsonwebtoken";
 
 
-export const  authMiddleWare = (req, res, next) => {
+export const authMiddleWare = (req, res, next) => {
     const checkAuthorised = req.headers.authorization;
     if (!checkAuthorised){
         return errorMessage(res, "Access Denied(0)", 401)

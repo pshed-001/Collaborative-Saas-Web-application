@@ -22,6 +22,7 @@ enum MembershipStatus{
   INACTIVE @map("inactive")
   PENDING @map("pending")
   REMOVED @map("removed")
+  REJECTED @map("rejected")
   LEFT @map("left")
 }
 
@@ -30,7 +31,7 @@ enum MembershipRole{
   MEMBER @map("member")
 }
 
-
+// added rejected , deleted and deleted at 
 
 model User {
   id String @id @default(uuid())
@@ -55,6 +56,12 @@ model Workspace{
   category String
   ownerId String 
   createdAt DateTime @default(now())
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  deletedBy String?
+  recoveredAt DateTime?
+  updatedAt DateTime?
+  updatedBy String?
   memberships Membership[]
   tasks Task[]
   owner User @relation(fields : [ownerId], references : [id])
@@ -65,9 +72,13 @@ model Membership{
   id String @id @default(uuid())
   userId String
   workspaceId String 
-  role MembershipRole @default(MEMBER)
+  role MembershipRole? @default(MEMBER)
   status MembershipStatus @default(PENDING)
-  joinedAt DateTime @default(now())
+  joinedAt DateTime? @default(now())
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  deletedBy String?
+  recoveredAt DateTime?
   user User @relation(fields : [userId], references : [id])
   workspace Workspace @relation(fields : [workspaceId], references : [id])
   @@unique([userId, workspaceId])
@@ -83,6 +94,10 @@ model Task{
   completedById String?
   assignedToId String?
   status String
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  deletedBy String?
+  recoveredAt DateTime?
   workspace Workspace @relation(fields : [workspaceId], references : [id]) 
   createdBy User @relation("CreatedTasks", fields : [createdById], references : [id])
   completedBy User? @relation("CompletedTasks", fields : [completedById], references : [id])

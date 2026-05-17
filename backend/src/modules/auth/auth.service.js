@@ -1,4 +1,4 @@
-import prisma from "../../config/prima.js";
+import prisma from "../../config/prisma.js";
 import { hashPassword, compareHash } from "../../utils/hash.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -119,7 +119,7 @@ export async function generateAccessToken(token) {
     return {
       id: decoded.id,
       username: decoded.username,
-      accessToken,refreshToken,
+      accessToken, refreshToken,
       error: false,
       message: "Successfully generated token",
       statusCode: 200,
@@ -182,3 +182,4 @@ export async function update() {
   }
 }
 
+// add session mgmt and standard cookie rotation

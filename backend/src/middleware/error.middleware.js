@@ -8,18 +8,26 @@ export const errorhandler = (err, req, res, next) => {
     return errorMessage(res, errors, err.statusCode);
   }
   console.log(err)
+  let statusCode = err.statusCode || 500
 
-  const statusCode = err.statusCode || 500
+  let message = err.message
+  if (err.code === "P2025") {
+    message = "Record not found or invalid input";
+    statusCode = 404
+  }
+  if (err.code === "P2002") {
+    message = "Record already exist with the same unique field value";
+    statusCode = 400
+  }
   return res.status(statusCode).json({
     error: true,
-    message: err.message || "Something unexpected happened",
+    message: message,
     data: {
       payload: null,
       meta: {
         timestamp: new Date().toISOString()
       }
     },
-    statusCode
   })
 
 };
