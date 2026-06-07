@@ -85,6 +85,7 @@ npm install
 npm run dev
 ```
 
+### Frontend Current State
 ```Frontend state
 Currently empty 
 Building backend first
