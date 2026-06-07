@@ -85,6 +85,11 @@ npm install
 npm run dev
 ```
 
+''' Frontend state
+Currently empty 
+Building backend first
+'''
+
 
 ## API Reference
 
