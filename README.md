@@ -2,6 +2,8 @@
 
 A team workspace and project management platform. Users can create workspaces, manage memberships, assign tasks, and collaborate across teams.
 
+# Projetc Status
+Backend API in active development (MVP stage). Core authentication (JWT access/refresh with rotation) and workspace role management (Member/Admin/Owner) are implemented and functional. Task management module, frontend, CORS configuration, and rate limiting are under development — see Known Issues below for full details.
 ---
 
 ## Tech Stack
