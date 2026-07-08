@@ -33,7 +33,7 @@ export async function registerUser(userInfo) {
   // checking if user already exists
   if (checkExistingUser) {
     // return error message
-    throw new AppError("User already exist", 400)
+    throw new AppError("User already exist", 409)
   } else {
     // hashing user password
     const hashedPassword = await hashPassword(userInfo.password);
@@ -49,7 +49,7 @@ export async function registerUser(userInfo) {
     });
     // return message of success
     return {
-      error: false,
+      success : true,
       data: {
         payload: {
           id: user.id,
@@ -60,7 +60,6 @@ export async function registerUser(userInfo) {
         }
       },
       message: "User created successfully.",
-      statusCode: 201
     };
   }
 }
@@ -87,8 +86,11 @@ export async function loginUser(userInfo) {
   const REFRESH_KEY = process.env.JWT_REFRESH_SECRET_KEY;
 
   const result = generateToken(ACCESS_KEY, REFRESH_KEY, user);
+  
   return {
-    id: user.id, username: user.username, accessToken: result.accessToken, refreshToken: result.refreshToken, error: false, message: "Successfully logged in", statusCode: 200
+    id: user.id, username: user.username, accessToken: result.accessToken, 
+    refreshToken: result.refreshToken, success: true, 
+    message: "Successfully logged in"
 
   }
 }
@@ -116,13 +118,13 @@ export async function generateAccessToken(token) {
       { id: decoded.id, username: decoded.username },
       REFRESH_KEY, { expiresIn: "3d" }
     )
+    // console.log(accessToken)
     return {
       id: decoded.id,
       username: decoded.username,
       accessToken, refreshToken,
-      error: false,
-      message: "Successfully generated token",
-      statusCode: 200,
+      success : true,
+      message: "Successfully generated token"
     }
   } catch (err) {
     // catching expired token error
@@ -153,15 +155,14 @@ export async function logout(request, response) {
     path: "/auth"
   });
   return {
-    error: false,
+    success : true,
     data: {
       payload: null,
       meta: {
         timestamp: new Date().toISOString()
       }
     },
-    message: "Successfully logged out",
-    statusCode: 200
+    message: "Successfully logged out"
   };
 }
 

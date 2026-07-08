@@ -221,7 +221,7 @@ async function deleteUserWorkspace(req, res, next) {
     try {
         const result = await deleteWorkspace(req.user.id, req.params.workspaceId);
 
-        res.status(result.statusCode).json({
+        res.status(200).json({
             success: result.success,
             message: result.message,
             data: {
@@ -242,7 +242,7 @@ async function leave(req, res, next) {
     try {
         const result = await leaveWorkspace(req.user.id, req.params.workspaceId);
 
-        res.status(result.statusCode).json({
+        res.status(200).json({
             success: result.success,
             message: result.message,
             data: {

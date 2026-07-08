@@ -31,6 +31,5 @@ export const authMiddleWare = (req, res, next) => {
         }else{
             next(err)
         }
-    }
-    
+    } 
 }

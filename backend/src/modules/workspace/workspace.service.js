@@ -1,42 +1,7 @@
 import prisma from "../../config/prisma.js";
 import "dotenv/config";
 import { AppError } from "../../middleware/apperror.js";
-
-
-// a function to check if a workspace exists or not
-const checkWorkspace = async (workspaceId) => {
-  const workspace = await prisma.workspace.findFirst({
-    // 400 if not valid input and 404 if not found
-    where: { id: workspaceId, isDeleted: false },
-  });
-  if (!workspace) {
-    throw new AppError("Workspace does not exist", 404);
-  }
-  return workspace;
-}
-
-const getMembership = async (targetUserId, workspaceId) => {
-  const membership = await prisma.membership.findFirst({
-    where: {
-      userId: targetUserId, workspaceId: workspaceId, isDeleted: false
-    }
-  })
-  return membership;
-}
-
-const validateUserAdmin = async (requesterId, workspaceId) => {
-  const membership = await prisma.membership.findFirst({
-    where: {
-      userId: requesterId,
-      workspaceId: workspaceId,
-      isDeleted: false
-    }
-  })
-  if (!membership || membership.role !== "ADMIN" || membership.status !== "ACTIVE") {
-    throw new AppError("Unauthorised access", 403);
-  }
-  return membership;
-}
+import { checkWorkspace, getMembership, validateUserAdmin } from "../../middleware/workspacePermission.js";
 
 // service to create a new workspace
 async function workspaceCreator(workspaceCreationData, userId) {
@@ -307,7 +272,7 @@ async function joinWorkspace(userId, workspaceId) {
               },
             },
             data: {
-              status: workspace.mode === "PRIVATE" ? "PENDING" : "ACTIVE",
+              status: workspace.mode === "PRIVATE" ? "PENDING" : "ACTIVE", role: "MEMBER"
             },
           });
           break;
@@ -491,6 +456,11 @@ async function rejectUser(requesterId, workspaceId, targetUserId) {
 // modify a workspace
 async function updateWorkspace(userId, workspaceId, workspaceData) {
   try {
+    // checking if workspace exists
+    await checkWorkspace(workspaceId);
+    // checking if user is an active administrator member
+    await validateUserAdmin(userId, workspaceId);
+
     let updateData = {};
     // validating user input and populating up  update data
     const { workspaceName, description, category, mode } = workspaceData
@@ -512,12 +482,9 @@ async function updateWorkspace(userId, workspaceId, workspaceData) {
     updateData.updatedBy = userId
     updateData.updatedAt = new Date();
 
-    // checking if workspace exists
-    await checkWorkspace(workspaceId);
-    // checking if user is an active administrator member
-    await validateUserAdmin(userId, workspaceId);
 
-    // updating workspace basede on user input
+
+    // updating workspace based on user input
     const updatedWorkspace = await prisma.workspace.update({
       where: {
         id: workspaceId,
@@ -621,8 +588,10 @@ async function leaveWorkspace(userId, workspaceId) {
     // updating user membership to left incase of new attempt to join
     updateMembership = await tx.membership.update({
       where: {
-        workspaceId: workspaceId,
-        userId: userId
+        userId_workspaceId: {
+          workspaceId,
+          userId
+        }
       },
       data: {
         status: "LEFT", role: null
@@ -631,7 +600,7 @@ async function leaveWorkspace(userId, workspaceId) {
   })
 
   return {
-    success: true, message: "User successfully removed",
+    success: true, message: "User left successfully",
     data: {
       workspaceId, userId,
       membershipStatus: updateMembership.status
@@ -754,10 +723,13 @@ async function updateUser(requesterId, targetUserId, workspaceId, newRole) {
 async function recoverWorkspace(userId, workspaceId) {
   try {
     // check if workspace exists 
-    const workspace = await checkWorkspace(workspaceId)
+    const workspace = await checkWorkspace(workspaceId);
+    if (workspace.isDeleted === false) {
+      throw new AppError("Workspace is not deleted", 400)
+    }
     // check if user is the workspace owner
     if (userId !== workspace.ownerId) {
-      throw new AppError("Only workspae owner can recover deleted workspace")
+      throw new AppError("Only workspace owner can recover deleted workspace", 409)
     }
     // field to update
     const updateData = { isDeleted: false, recoveredAt: new Date() }
@@ -798,14 +770,15 @@ async function recoverWorkspace(userId, workspaceId) {
     throw err
   }
 }
+
 // delete workspace permanaently
 async function deleteWorkspacePermanently(userId, workspaceId) {
   // checking if workspace exists
-  await checkWorkspace(workspaceId)
+  const workspace = await checkWorkspace(workspaceId)
 
   // ensuring only owner can delete workspace
   if (workspace.ownerId !== userId) {
-    throw new AppError("Unauthorised access", 403)
+    throw new AppError("Unauthorized access", 403)
   }
   // making use of transactions to make sure that all related data is deleted at the same 
   // time to prevent orphan data and maintain data integrity
@@ -887,6 +860,7 @@ async function autoDelete() {
     throw err;
   }
 }
+
 export {
   approveUser, deleteWorkspace, deleteWorkspacePermanently, getMembers,
   getUserWorkspace, getWorkspaces, getWorkspaceContent,
@@ -895,4 +869,4 @@ export {
   updateWorkspace, workspaceCreator
 };
 
-// 
+//                  

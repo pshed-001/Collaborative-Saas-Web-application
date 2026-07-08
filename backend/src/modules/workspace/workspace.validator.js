@@ -41,7 +41,7 @@ const validateWorkspaceInput = [
     .customSanitizer((value) => {
       if (!Array.isArray(value)) return '';
       return value.map((cat) => cat.toLowerCase().trim()).join(',');
-    }),
+    }).escape(),
 
   body('mode')
     .notEmpty()
@@ -53,7 +53,7 @@ const validateWorkspaceInput = [
       }
       return true;
     })
-    .customSanitizer((value) => (value ? value.toUpperCase() : value)),
+    .customSanitizer((value) => (value ? value.toUpperCase() : value)).escape(),
 ];
 
 const validateWorkspaceUpdateInput = [
@@ -87,7 +87,7 @@ const validateWorkspaceUpdateInput = [
     .customSanitizer((value) => {
       if (!Array.isArray(value)) return '';
       return value.map((cat) => cat.toLowerCase().trim()).join(',');
-    }),
+    }).escape(),
 
   body('mode')
     .optional()
@@ -96,7 +96,7 @@ const validateWorkspaceUpdateInput = [
         throw new Error('Workspace mode cannot be updated.');
       }
       return true;
-    }),
+    }).escape(),
 ];
 
 const validateRole = [
@@ -106,8 +106,9 @@ const validateRole = [
     .bail()
     .customSanitizer((value) => (value ? value.toUpperCase() : value))
     .isIn(allowedRoles)
-    .withMessage("Invalid role selected")
+    .withMessage("Invalid role selected").escape()
 ]
+
 const validateWorkspaceResult = validateAuthResult;
 
 export {

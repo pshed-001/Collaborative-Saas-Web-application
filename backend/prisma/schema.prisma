@@ -27,8 +27,23 @@ enum MembershipStatus{
 }
 
 enum MembershipRole{
-  ADMIN @map("admin")
-  MEMBER @map("member")
+  ADMIN   @map("admin")
+  MEMBER  @map("member")
+}
+
+enum TaskPriority{
+  LOW     @map("low")
+  NORMAL  @map("normal")
+  HIGH     @map("high")
+}
+
+enum TaskStatus {
+  TODO        @map("todo")
+  IN_PROGRESS @map("in-progress")
+  IN_REVIEW   @map("in-review")
+  REVIEWED    @map("reviewed")
+  CANCELLED   @map("cancelled")
+  COMPLETED   @map("completed")
 }
 
 // added rejected , deleted and deleted at 
@@ -93,11 +108,18 @@ model Task{
   createdById String
   completedById String?
   assignedToId String?
-  status String
+  status TaskStatus @default(TODO)
+  priority TaskPriority @default(LOW)
+  duedate DateTime
+  updatedAt DateTime?
+  updatedById String?
   isDeleted Boolean @default(false)
   deletedAt DateTime?
   deletedBy String?
   recoveredAt DateTime?
+  recoveredBy String?
+  @@unique([id, workspaceId])
+  @@unique([title, workspaceId])
   workspace Workspace @relation(fields : [workspaceId], references : [id]) 
   createdBy User @relation("CreatedTasks", fields : [createdById], references : [id])
   completedBy User? @relation("CompletedTasks", fields : [completedById], references : [id])
