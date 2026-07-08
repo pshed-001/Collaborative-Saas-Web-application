@@ -151,7 +151,6 @@ Building backend first
 
 - `task` and `membership` modules are not yet implemented
 - No CORS configuration — frontend requests will be blocked until added
-- No rate limiting on auth endpoints
 - Frontend is not yet built
 
 ---
