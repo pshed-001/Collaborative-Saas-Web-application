@@ -5,7 +5,7 @@ import redisConnect from "../../utils/redis-client.js"
 const store = new RedisStore({
     sendCommand : (args) => {
         console.log(args)
-        redisConnect.sendCommand(args)
+        return redisConnect.sendCommand(args)
     },
     prefix : "global-r1"
 })
