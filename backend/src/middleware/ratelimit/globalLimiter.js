@@ -10,8 +10,8 @@ const store = new RedisStore({
 })
 
 const limiter = rateLimit({
-    windowMs : 5 * 60 * 1000,
-    limit : 5,
+    windowMs : 60 * 60 * 1000,
+    limit : 50,
     standardHeaders : true,
     legacyHeaders : false,
     store 
