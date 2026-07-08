@@ -1,60 +1,60 @@
-import {
-    createTaskController,
-    getAllTasksController,
-    getSingleTaskController,
-    updateTaskController,
-    deleteTaskController,
-    restoreTaskController,
-    deleteTaskPermanentlyController,
-    getDeletedTaskController,
-    completeTaskController,
-    cancelTaskController,
-    reopenTaskController,
-    assignTaskController,
-    submitTaskController,
-    addTaskCommentController,
-    getTasksCommentsController,
-    watchTaskController,
-    unWatchTaskController,
-    uploadAttachmentController,
-    deleteAttachmentController,
-    getTaskLogsController
-} from "./task.controller.js";
+// 'use strict'
+import * as taskCtrl from "./task.controller.js";
 
 import { authMiddleWare } from "../../middleware/auth.middleware.js";
 import express from "express";
 
-import { 
-    validateTaskCreation, 
-    validateTaskUpdate, 
-    validateTaskStatus, 
-    validateTaskResult} from "./task.validator.js";
+// importing validators and validation rules
+import {
+    validateTaskCreation,
+    validateTaskUpdate,
+    validateTaskStatus,
+    validateTaskResult
+} from "./task.validator.js";
 
-const taskRouter = express.Router()
+const taskRouter = express.Router({ mergeParams : true })
 
-taskRouter.post("/", authMiddleWare, validateTaskCreation, validateTaskResult, createTaskController)
-taskRouter.get("/", authMiddleWare, getAllTasksController)
-taskRouter.get("/:taskId", authMiddleWare, getSingleTaskController)
-taskRouter.patch("/:taskId", authMiddleWare, validateTaskUpdate, validateTaskResult, updateTaskController)
-taskRouter.delete("/:taskId", authMiddleWare, deleteTaskController)
+// general static routes
+taskRouter.get("/trash", taskCtrl.getDeletedTaskController)
 
-//^ is done in modification
+// route for creating a task and accessing a task
+taskRouter.post("/", validateTaskCreation, validateTaskResult, taskCtrl.createTaskController)
+taskRouter.get("/", taskCtrl.getAllTasksController)
 
-taskRouter.patch("/:taskId/restore", authMiddleWare, restoreTaskController)
-taskRouter.delete("/:taskId/deletepermanently", authMiddleWare, deleteTaskPermanentlyController)
-taskRouter.get("/trash", authMiddleWare, getDeletedTaskController)
-taskRouter.patch("/:taskId/complete", authMiddleWare, completeTaskController)
-taskRouter.patch("/:taskId/cancel", authMiddleWare, cancelTaskController)
-taskRouter.patch("/:taskId/reopen", authMiddleWare, reopenTaskController)
-taskRouter.post("/:taskId/assign", authMiddleWare, assignTaskController)
-taskRouter.post("/:taskId/submit", authMiddleWare, submitTaskController)
-taskRouter.post("/:taskId/comments", authMiddleWare, addTaskCommentController)
-taskRouter.get("/:taskId/comments", authMiddleWare, getTasksCommentsController)
-taskRouter.post("/:taskId/watch", authMiddleWare, watchTaskController)
-taskRouter.patch("/:taskId/unwatch", authMiddleWare, unWatchTaskController)
-taskRouter.post("/:taskId/attachments", authMiddleWare, uploadAttachmentController)
-taskRouter.delete("/:taskId/attachments/:attachmentId", authMiddleWare, deleteAttachmentController)
-taskRouter.get("/:taskId/activity-logs", authMiddleWare, getTaskLogsController)
+// routes that needs params and single nested params
+// crud routes 
+taskRouter.patch("/:taskId/complete", taskCtrl.completeTaskController)
+taskRouter.patch("/:taskId/cancel", taskCtrl.cancelTaskController)
+taskRouter.patch("/:taskId/reopen", taskCtrl.reopenTaskController)
+taskRouter.post("/:taskId/assign", taskCtrl.assignTaskController)
+taskRouter.post("/:taskId/submit", taskCtrl.submitTaskController)
 
+//
+taskRouter.patch("/:taskId/restore", taskCtrl.restoreTaskController)
+taskRouter.delete("/:taskId/permanent-delete", taskCtrl.deleteTaskPermanentlyController)
+
+
+
+// comments
+taskRouter.post("/:taskId/comments", taskCtrl.addTaskCommentController)
+taskRouter.get("/:taskId/comments", taskCtrl.getTasksCommentsController)
+
+// watching and unwatching a task
+taskRouter.post("/:taskId/watch", taskCtrl.watchTaskController)
+taskRouter.patch("/:taskId/unwatch", taskCtrl.unWatchTaskController)
+
+// adding attachmenst and fetching them routes
+taskRouter.post("/:taskId/attachments", taskCtrl.uploadAttachmentController)
+taskRouter.delete("/:taskId/attachments/:attachmentId", taskCtrl.deleteAttachmentController)
+
+// activity logs per task : who assigned who commented who chanbged status 
+taskRouter.get("/:taskId/activity-logs", taskCtrl.getTaskLogsController)
+
+//general task route 
+taskRouter.get("/:taskId", taskCtrl.getSingleTaskController)
+taskRouter.patch("/:taskId", validateTaskUpdate, validateTaskResult, taskCtrl.updateTaskController)
+taskRouter.delete("/:taskId", taskCtrl.deleteTaskController)
 
 export default taskRouter;
+
+//

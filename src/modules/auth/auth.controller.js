@@ -6,7 +6,6 @@ import {
   update
 } from "./auth.service.js";
 
-import jwt from "jsonwebtoken";
 
 export const updateUser = async (req, res, next) => {
   try {
@@ -26,7 +25,7 @@ export const register = async (req, res, next) => {
     const newUsers = await registerUser(req.body);
     // returning new user credentials
     // console.log(newUsers)
-    return res.status(newUsers.statusCode).json(newUsers);
+    return res.status(200).json(newUsers);
   } catch (err) {
     //middleware handles error
     next(err);
@@ -48,8 +47,8 @@ export const login = async (req, res, next) => {
 
 
     res.setHeader("Authorization", `Bearer ${result.accessToken}`);
-    res.status(result.statusCode).json({
-      error: false,
+    res.status(200).json({
+      success: result.success,
       data: {
         payload: {
           id: result.id,
@@ -60,8 +59,6 @@ export const login = async (req, res, next) => {
         }
       },
       message: result.message,
-      statusCode: result.statusCode
-
       // expiresIn: getExpire.toString(),
     });
   } catch (err) {
@@ -81,8 +78,8 @@ export const accessTokenGenerator = async (req, res, next) => {
       maxAge : 1000 * 60 *60 * 24 * 3
     })
     res.setHeader("Authorization", `Bearer ${result.accessToken}`);
-    res.status(result.statusCode).json({
-      error: false,
+    res.status(200).json({
+      success: result.success,
       data: {
         payload: {
           id: result.id,
@@ -93,8 +90,6 @@ export const accessTokenGenerator = async (req, res, next) => {
         }
       },
       message: result.message,
-      statusCode: result.statusCode
-
       // expiresIn: getExpire.toString(),
     });
   } catch (err) {
@@ -105,7 +100,7 @@ export const accessTokenGenerator = async (req, res, next) => {
 export const loggedOut = async (req, res, next) => {
   try {
     const result = await logout(req, res);
-    return res.status(result.statusCode).json(result);
+    return res.status(200).json(result);
   } catch (err) {
     //console.log(err)
     next(err);

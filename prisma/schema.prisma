@@ -110,6 +110,7 @@ model Task{
   assignedToId String?
   status TaskStatus @default(TODO)
   priority TaskPriority @default(LOW)
+  duedate DateTime
   updatedAt DateTime?
   updatedById String?
   isDeleted Boolean @default(false)

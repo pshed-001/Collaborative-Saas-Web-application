@@ -23,6 +23,21 @@ import {
 
 async function createTaskController(req, res, next) {
     try {
+        const userId = req.user.id
+        const workspaceId = req.params.workspaceId
+        const taskData = req.body
+        const result = await createTask(userId,workspaceId, taskData )
+        
+        res.status(201).json({
+            success :  result.success,
+            message : result.message,
+            data : {
+                payload : result.data,
+                meta : {
+                    timestamp : new Date()
+                }
+            }
+        })
     } catch (err) {
         next(err);
     }
@@ -32,7 +47,7 @@ async function getAllTasksController(req, res, next) {
     try {
         const userId = req.user.id;
         const workspaceId = req.params.workspaceId;
-        const result = await getTasks(userId, workspaceId);
+        const result = await getAllTasks(userId, workspaceId);
         res.status(200).json({
             success: result.success,
             message: result.message,

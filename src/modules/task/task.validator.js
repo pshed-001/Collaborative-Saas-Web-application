@@ -1,7 +1,7 @@
 import { body } from "express-validator";
-import { validateAuthResult } from "../auth/auth.validator";
+import { validateAuthResult } from "../auth/auth.validator.js";
 
-const allowedPriority = ["low", "medium", "high"]
+const allowedPriority = ["LOW", "NORMAL", "HIGH"]
 const allowedStatus = ["todo", "in-progress", "in-review", "completed", "cancelled", "reviewed"]
 
 const normaliseLowerCase = (str) => { return typeof str === "string" ? str.toLowerCase() : str }
@@ -19,16 +19,16 @@ const validateTaskCreation = [
         .withMessage("Task description contains invalid special characters"),
     body("duedate")
         .isString().withMessage("Due date can only be in strings").bail()
-        .isISO8601()
-        .withMessage("Kindly provide a valid date format"),
+       .isISO8601()
+       .withMessage("Kindly provide a valid date format"),
     body("priority")
-        .optional({ nullable: true, checkFalsy: true })
+//        .optional({ nullable: true, checkFalsy: true })
         .trim()
-        .customSanitizer(value => normaliseLowerCase(value))
+        //.customSanitizer(value => normaliseLowerCase(value))
         .isIn(allowedPriority)
         .withMessage("Kindly select a valid task priority"),
     body("assignedTo")
-        .optional({ nullable: true }).trim()
+ //       .optional({ nullable: true }).trim()
         .isUUID()
         .withMessage("Assigned user Id must be a valid UUID"),
 ]

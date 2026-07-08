@@ -52,14 +52,14 @@ export const validateLogin = [
     .notEmpty()
     .withMessage("A password is required")
     .isLength({ min: 10 })
-    .withMessage("Password length must not be less than 10 characters.").trim(),
+    .withMessage("Password length can not be less than 10 characters.").trim(),
 ];
 
 export const validateAuthResult = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.array().length > 0) {
     return next({
-      status: 400,
+      statusCode: 400,
       errors: errors.array()[0].msg,
     });
   }

@@ -6,12 +6,13 @@ export const errorhandler = (err, req, res, next) => {
   console.error(err);
   if (err.errors) {
     console.log(err.errors);
-    const errors = err.errors;
-    return errorMessage(res, errors, err.statusCode);
+    const msg = err.errors;
+    return errorMessage(res, msg, err.statusCode)
   }
-  let statusCode = err.statusCode || 500
 
-  let message = err.message
+  let statusCode = err.statusCode || 500
+  let message = err.message 
+
   if (err.code === "P2025") {
     message = "Record not found or invalid input";
     statusCode = 404
@@ -20,15 +21,6 @@ export const errorhandler = (err, req, res, next) => {
     message = "Record already exist with the same unique field value";
     statusCode = 400
   }
-  return res.status(statusCode).json({
-    error: true,
-    message: message,
-    data: {
-      payload: null,
-      meta: {
-        timestamp: new Date().toISOString()
-      }
-    },
-  })
+  errorMessage(res, message, statusCode)
 
 };

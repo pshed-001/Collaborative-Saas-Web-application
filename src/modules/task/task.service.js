@@ -12,9 +12,9 @@ async function createTask(userId, workspaceId, taskData) {
     try {
         await checkWorkspace(workspaceId);
         await getMembership(userId, workspaceId);
-        const { title, description, priority, duedate, assignedToId } = taskData;
-        if (assignedToId !== undefined) {
-            await getMembership(assignedToId, workspaceId, (context = "ASSIGNEE"));
+        const { title, description, priority, duedate, assignedTo } = taskData;
+        if (assignedTo !== undefined) {
+            await getMembership(assignedTo, workspaceId, "ASSIGNEE");
         }
         const existingTask = await prisma.task.findFirst({
             where: {
@@ -24,8 +24,9 @@ async function createTask(userId, workspaceId, taskData) {
             },
         });
         if (existingTask) {
-            throw new AppError("Task already exists inn this workspace");
+            throw new AppError("Task already exists in this workspace", 409);
         }
+        console.log(priority)
         const create = await prisma.task.create({
             data: {
                 title,
@@ -33,7 +34,7 @@ async function createTask(userId, workspaceId, taskData) {
                 workspaceId,
                 createdById: userId,
                 duedate,
-                assignedToId,
+                assignedToId : assignedTo,
                 priority,
             },
         });
@@ -92,7 +93,7 @@ async function getAllTasks(userId, workspaceId, search, query) {
             success: true,
             message: "Tasks fetched successfully",
             data: result,
-            count: tasks.count(),
+            count: tasks.count,
         };
     } catch (err) {
         throw err;
@@ -186,19 +187,21 @@ async function updateTask(userId, taskId, workspaceId, data) {
 async function deleteTask(userId, taskId, workspaceId) {
     try {
         await checkWorkspace(workspaceId);
-        const membership = await getMembership(userId, workspaceId)
+        const membership = await getMembership(userId, workspaceId);
         const task = await prisma.task.findFirst({
             where: {
                 id_workspaceId: {
-                    id: taskId, workspaceId
-                }, isDeleted: false
-            }
-        })
+                    id: taskId,
+                    workspaceId,
+                },
+                isDeleted: false,
+            },
+        });
         if (!task) {
-            throw new AppError("Task does not exist", 404)
+            throw new AppError("Task does not exist", 404);
         }
         if (membership.role !== "ADMIN" && task.createdById !== userId) {
-            throw new AppError("Unauthorized access", 403)
+            throw new AppError("Unauthorized access", 403);
         }
         const deletedTask = await prisma.task.update({
             where: {
@@ -227,8 +230,8 @@ async function deleteTask(userId, taskId, workspaceId) {
         return {
             success: true,
             message: "Task deleted successfully",
-            data: deletedTask
-        }
+            data: deletedTask,
+        };
     } catch (err) {
         throw err;
     }
@@ -236,57 +239,63 @@ async function deleteTask(userId, taskId, workspaceId) {
 async function restoreTask(userId, taskId, workspaceId) {
     try {
         await checkWorkspace(workspaceId);
-        const membership = await getMembership(userId, workspaceId)
+        const membership = await getMembership(userId, workspaceId);
         const task = await prisma.task.findFirst({
             where: {
                 id_workspaceId: {
-                    id: taskId, workspaceId
-                }, isDeleted: true
-            }
-        })
+                    id: taskId,
+                    workspaceId,
+                },
+                isDeleted: true,
+            },
+        });
         if (!task) {
-            throw new AppError("Task does not exists in deleted tasks", 404)
+            throw new AppError("Task does not exists in deleted tasks", 404);
         }
         if (membership.role !== "ADMIN" && task.createdById !== userId) {
-            throw new AppError("Unauthorized access", 403)
+            throw new AppError("Unauthorized access", 403);
         }
         const updateData = {
-            isDeleted: false, recoveredAt: new Date(), recoveredBy: userId
-        }
+            isDeleted: false,
+            recoveredAt: new Date(),
+            recoveredBy: userId,
+        };
         const restore = await prisma.task.update({
             where: {
                 id_workspaceId: {
-                    id: taskId, workspaceId
-                }
-            }, data: updateData
-        })
+                    id: taskId,
+                    workspaceId,
+                },
+            },
+            data: updateData,
+        });
         const { isDeleted, deletedAt, deletedBy, ...result } = restore;
         return {
             success: true,
             message: "Task restored successfully",
-            data: result
-        }
-
+            data: result,
+        };
     } catch (err) {
-        throw err
+        throw err;
     }
 }
 async function deleteTaskPermanently(userId, taskId, workspaceId) {
     try {
-        await taskRules(true, taskId, userId, workspaceId)
+        await taskRules(true, taskId, userId, workspaceId);
 
         await prisma.task.delete({
             where: {
                 id_workspaceId: {
-                    id: taskId, workspaceId
-                }
-            }
-        })
+                    id: taskId,
+                    workspaceId,
+                },
+            },
+        });
         return {
             success: true,
             message: "Task permanently deleted",
-            data: {}
-        }
+            data: {},
+        };
     } catch (err) {
         throw err;
     }
@@ -294,12 +303,14 @@ async function deleteTaskPermanently(userId, taskId, workspaceId) {
 async function getDeletedTask(userId, workspaceId) {
     try {
         await checkWorkspace(workspaceId);
-        await getMembership(userId, workspaceId)
+        await getMembership(userId, workspaceId);
 
         const deletedTask = await prisma.task.findMany({
             where: {
-                workspaceId, isDeleted: true
-            }, select: {
+                workspaceId,
+                isDeleted: true,
+            },
+            select: {
                 id: true,
                 title: true,
                 description: true,
@@ -316,80 +327,77 @@ async function getDeletedTask(userId, workspaceId) {
                 deletedAt: true,
                 deletedBy: true,
                 recoveredAt: true,
-                recoveredBy: true
-            }
-        })
+                recoveredBy: true,
+            },
+        });
 
         const count = await prisma.task.count({
             where: {
-                workspaceId, isDeleted: true
-            }
-        })
+                workspaceId,
+                isDeleted: true,
+            },
+        });
         return {
             success: true,
             message: "Deleted tasks fetched successfully",
             data: result,
-            count
-        }
+            count,
+        };
     } catch (err) {
-        throw err
+        throw err;
     }
 }
 async function completeTask(userId, taskId, workspaceId, data) { }
 async function cancelTask(userId, taskId, workspaceId, data) { }
 async function reopenTask(userId, taskId, workspaceId, data) { }
 async function assignTask(userId, taskId, workspaceId, assignedUserId) {
-    const { task } = await taskRules(true, taskId, userId, workspaceId)
+    const { task } = await taskRules(true, taskId, userId, workspaceId);
 
     if (!assignedUserId) {
-        throw new AppError("Assigned user is required", 400)
+        throw new AppError("Assigned user is required", 400);
     }
-    await getMembership(assignedUserId, workspaceId)
+    await getMembership(assignedUserId, workspaceId);
 
     const status = task.status;
     switch (status) {
         case "CANCELLED":
-            throw new AppError("Cancelled task cannot be reassigned", 409)
+            throw new AppError("Cancelled task cannot be reassigned", 409);
         case "COMPLETED":
-            throw new AppError("Completed task cannot be reassigned")
+            throw new AppError("Completed task cannot be reassigned", 409);
         default:
             break;
     }
     if (task.assignedToId === assignedUserId) {
-        throw new AppError("Cannot reassign the same user to this task", 409)
+        throw new AppError("Cannot reassign the same user to this task", 409);
     }
 
     const data = {
-        assignedToId: assignedUserId, updatedAt: new Date(), updatedById: userId
-    }
+        assignedToId: assignedUserId,
+        updatedAt: new Date(),
+        updatedById: userId,
+    };
     const assignedUser = await prisma.task.update({
         where: {
             id_workspaceId: {
-                id: taskId, workspaceId
-            }
-        }, data: data, select: {
-            id: true, updatedAt: true, updatedById: true, assignedToId: true
-        }
-    })
+                id: taskId,
+                workspaceId,
+            },
+        },
+        data: data,
+        select: {
+            id: true,
+            updatedAt: true,
+            updatedById: true,
+            assignedToId: true,
+        },
+    });
     return {
         success: true,
-        messasge: "Task assigned successfully",
-        data: assignedUser
-    }
-
+        message: "Task assigned successfully",
+        data: assignedUser,
+    };
 }
-async function submitTask(userId, taskId, workspaceId, data) {
-    
- }
-
-
-
-
-
-
-
-
-
+async function submitTask(userId, taskId, workspaceId, data) { }
 
 async function addTaskComment(userId, taskId, workspaceId, data) { }
 async function getTasksComments(userId, taskId, workspaceId, data) { }
