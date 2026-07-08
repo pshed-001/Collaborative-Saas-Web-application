@@ -3,8 +3,7 @@ import { rateLimit } from "express-rate-limit"
 import redisConnect from "../../utils/redis-client.js"
 
 const store = new RedisStore({
-    sendCommand : (args) => {
-        console.log(args)
+    sendCommand : (...args) => {
         return redisConnect.sendCommand(args)
     },
     prefix : "global-r1"
