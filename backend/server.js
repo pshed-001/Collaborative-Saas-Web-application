@@ -5,7 +5,7 @@ const host = process.env.HOST || "localhost"
 const port = process.env.PORT || 8080
 
 const server = app.listen(port, host, () => {
-    console.log(`Server started listening on http:${host}:${port}`)
+    console.log(`Server started listening on http://${host}:${port}`)
 })
 
 
