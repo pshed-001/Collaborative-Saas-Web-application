@@ -1,7 +1,7 @@
 import app from "./src/app.js"
 import "dotenv/config"
 
-const host = process.env.HOST || "localhost"
+const host = process.env.HOST || "0.0.0.0"
 const port = process.env.PORT || 8080
 
 const server = app.listen(port, host, () => {
