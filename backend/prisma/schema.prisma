@@ -12,29 +12,29 @@ datasource db {
   provider = "sqlite"
 }
 
-enum WorkspaceMode{
-  PUBLIC @map("public")
+enum WorkspaceMode {
+  PUBLIC  @map("public")
   PRIVATE @map("private")
 }
 
-enum MembershipStatus{
-  ACTIVE @map("active")
+enum MembershipStatus {
+  ACTIVE   @map("active")
   INACTIVE @map("inactive")
-  PENDING @map("pending")
-  REMOVED @map("removed")
+  PENDING  @map("pending")
+  REMOVED  @map("removed")
   REJECTED @map("rejected")
-  LEFT @map("left")
+  LEFT     @map("left")
 }
 
-enum MembershipRole{
-  ADMIN   @map("admin")
-  MEMBER  @map("member")
+enum MembershipRole {
+  ADMIN  @map("admin")
+  MEMBER @map("member")
 }
 
-enum TaskPriority{
-  LOW     @map("low")
-  NORMAL  @map("normal")
-  HIGH     @map("high")
+enum TaskPriority {
+  LOW    @map("low")
+  NORMAL @map("normal")
+  HIGH   @map("high")
 }
 
 enum TaskStatus {
@@ -46,82 +46,167 @@ enum TaskStatus {
   COMPLETED   @map("completed")
 }
 
+enum AllowedUserForDel {
+  OWNER @map("owner")
+  ACCOUNT_DELETION_REQUEST @map("account-deletion-request")
+  BACKGROUND_JOB @map("background-job")
+}
 // added rejected , deleted and deleted at 
 
 model User {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
   firstname String
-  lastname String
-  username String @unique 
-  email String @unique
-  password String
+  lastname  String
+  username  String   @unique
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  deletedBy AllowedUserForDel? // for managing either self deleting account or requesting account deletion
+
   ownedWorkspaces Workspace[]
-  memberships Membership[]
-  createdTasks Task[] @relation("CreatedTasks")
-  assignedTasks Task[] @relation("AssignedTasks")
-  completedTasks Task[] @relation("CompletedTasks")
+  memberships     Membership[]
+  createdTasks    Task[]       @relation("CreatedTasks")
+  assignedTasks   Task[]       @relation("AssignedTasks")
+  completedTasks  Task[]       @relation("CompletedTasks")
+
+  repliedComments Comment[] @relation("RepliedComments")
+  createdComments Comment[] @relation("CreatedComments")
+  deletedComments Comment[] @relation("DeletedComments")
+
+  updatedWorkspaces   Workspace[] @relation("UpdatedWorkspaces")
+  recoveredWorkspaces Workspace[] @relation("RecoveredWorkspaces")
+  deletedWorkspaces   Workspace[] @relation("DeletedWorkspaces")
+
+  updatedTasks   Task[] @relation("UpdatedTasks")
+  deletedTasks   Task[] @relation("DeletedTasks")
+  recoveredTasks Task[] @relation("RecoveredTasks")
+
+  @@index([isDeleted])
 }
 
-model Workspace{
-  id String @id @default(uuid())
-  name String 
-  description String
-  mode WorkspaceMode @default(PUBLIC)
-  category String
-  ownerId String 
-  createdAt DateTime @default(now())
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  deletedBy String?
-  recoveredAt DateTime?
-  updatedAt DateTime?
-  updatedBy String?
+model Workspace {
+  id            String        @id @default(uuid())
+  name          String
+  description   String
+  mode          WorkspaceMode @default(PUBLIC)
+  category      String
+  ownerId       String
+  createdAt     DateTime      @default(now())
+  isDeleted     Boolean       @default(false)
+  deletedAt     DateTime?
+  deletedById   String?
+  deletedByUser User?         @relation("DeletedWorkspaces", fields: [deletedById], references: [id])
+  recoveredAt   DateTime?
+
+  recoveredById  String?
+  recoveredByUser User?     @relation("RecoveredWorkspaces", fields: [recoveredById], references: [id])
+  updatedAt      DateTime? @updatedAt // just added the @relation when creating comment model
+  updatedById    String? // updated for getting user relation on updated workspaces
+  updatedByUser  User?     @relation("UpdatedWorkspaces", fields: [updatedById], references: [id])
+
   memberships Membership[]
-  tasks Task[]
-  owner User @relation(fields : [ownerId], references : [id])
+  tasks       Task[]
+  owner       User         @relation(fields: [ownerId], references: [id])
+
   @@unique([name, ownerId])
+  @@index([ownerId])
+  @@index([isDeleted])
 }
 
-model Membership{
-  id String @id @default(uuid())
-  userId String
-  workspaceId String 
-  role MembershipRole? @default(MEMBER)
-  status MembershipStatus @default(PENDING)
-  joinedAt DateTime? @default(now())
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  deletedBy String?
-  recoveredAt DateTime?
-  user User @relation(fields : [userId], references : [id])
-  workspace Workspace @relation(fields : [workspaceId], references : [id])
-  @@unique([userId, workspaceId])
-}
-
-model Task{
-  id String @id @default(uuid())
-  title String
-  description String
+model Membership {
+  id          String           @id @default(uuid())
+  userId      String
   workspaceId String
-  createdAt DateTime @default(now())
-  createdById String
-  completedById String?
-  assignedToId String?
-  status TaskStatus @default(TODO)
-  priority TaskPriority @default(LOW)
-  duedate DateTime
-  updatedAt DateTime?
-  updatedById String?
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  deletedBy String?
+  role        MembershipRole   @default(MEMBER)
+  status      MembershipStatus @default(PENDING)
+  joinedAt    DateTime       @default(now())
+  isDeleted   Boolean          @default(false)
+  deletedAt   DateTime?
+  deletedById   String?
   recoveredAt DateTime?
-  recoveredBy String?
-  @@unique([id, workspaceId])
+
+  user      User      @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
+  @@index([status])
+  @@index([workspaceId, status])
+  @@index([isDeleted])
+}
+
+model Task {
+  id            String       @id @default(uuid())
+  title         String
+  description   String
+  workspaceId   String
+  createdAt     DateTime     @default(now())
+  createdById   String
+  completedById String?
+  completedAt DateTime?
+  assignedToId  String?
+  status        TaskStatus   @default(TODO)
+  priority      TaskPriority @default(LOW)
+  dueDate       DateTime
+  updatedAt     DateTime?    @updatedAt // just added the @relation when creating comment model
+  isDeleted     Boolean      @default(false)
+  deletedAt     DateTime?
+  recoveredAt   DateTime?
+
+  updatedById     String?
+  deletedById     String?
+  recoveredById   String?
+  updatedByUser   User?   @relation("UpdatedTasks", fields: [updatedById], references: [id])
+  deletedByUser   User?   @relation("DeletedTasks", fields: [deletedById], references: [id])
+  recoveredByUser User?   @relation("RecoveredTasks", fields: [recoveredById], references: [id])
+
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  createdBy    User      @relation("CreatedTasks", fields: [createdById], references: [id])
+  completedBy  User?     @relation("CompletedTasks", fields: [completedById], references: [id])
+  assignedTo   User?     @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  taskComments Comment[]
+
   @@unique([title, workspaceId])
-  workspace Workspace @relation(fields : [workspaceId], references : [id]) 
-  createdBy User @relation("CreatedTasks", fields : [createdById], references : [id])
-  completedBy User? @relation("CompletedTasks", fields : [completedById], references : [id])
-  assignedTo User? @relation("AssignedTasks", fields : [assignedToId], references : [id])
+  @@index([workspaceId])
+  @@index([assignedToId])
+  @@index([completedById])
+  @@index([createdById])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([isDeleted])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt
+  depth     Int       @default(0)
+  
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  deletedById String?
+  deletedByUser User? @relation("DeletedComments", fields: [deletedById], references: [id])
+  authorId String
+  author   User   @relation("CreatedComments", fields: [authorId], references: [id])
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id])
+
+  repliedUserId String?
+  repliedUser   User?   @relation("RepliedComments", fields: [repliedUserId], references: [id], onDelete: SetNull)
+
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  Comment[] @relation("CommentReplies")
+  // @@check("depth <= 1")
+
+  @@index([taskId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([isDeleted])
 }
