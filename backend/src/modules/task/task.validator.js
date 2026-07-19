@@ -2,14 +2,16 @@ import { body } from "express-validator";
 import { validateAuthResult } from "../auth/auth.validator.js";
 
 const allowedPriority = ["LOW", "NORMAL", "HIGH"]
-const allowedStatus = ["todo", "in-progress", "in-review", "completed", "cancelled", "reviewed"]
+const allowedStatus = ["COMPLETED", "IN_REVIEW", "IN_PROGRESS", "REVIEWED", "CANCELLED", "TODO"]
 
 const normaliseLowerCase = (str) => { return typeof str === "string" ? str.toLowerCase() : str }
+const normaliseUpperCase = (str) => { return typeof str === "string" ? str.toUpperCase() : str }
 
 const validateTaskCreation = [
     body("title")
         .trim()
         .notEmpty()
+        .isLength({ min: 3, max: 50 })
         .withMessage("Task title cannot be empty"),
     body("description")
         .trim()
@@ -17,18 +19,15 @@ const validateTaskCreation = [
         .withMessage("Task description cannot be empty").bail()
         .isLength({ min: 3, max: 500 })
         .withMessage("Task description contains invalid special characters"),
-    body("duedate")
-        .isString().withMessage("Due date can only be in strings").bail()
-       .isISO8601()
-       .withMessage("Kindly provide a valid date format"),
+    body("dueDate")
+        .isISO8601()
+        .withMessage("Kindly provide a valid date format"),
     body("priority")
-//        .optional({ nullable: true, checkFalsy: true })
         .trim()
-        //.customSanitizer(value => normaliseLowerCase(value))
         .isIn(allowedPriority)
         .withMessage("Kindly select a valid task priority"),
     body("assignedTo")
- //       .optional({ nullable: true }).trim()
+        //       .optional({ nullable: true }).trim()
         .isUUID()
         .withMessage("Assigned user Id must be a valid UUID"),
 ]
@@ -37,23 +36,21 @@ const validateTaskUpdate = [
     body("title")
         .optional({ nullable: true })
         .trim()
-        .isLength({ min: 3, max: 20 })
+        .isLength({ min: 3, max: 50 })
         .withMessage("Task title cannot be less than 3 characters and more than 20 characters"),
-    //.matches(/^[a-zA-Z0-9 .,!?'"\-]+$/)
     body("description")
         .optional({ nullable: true })
         .trim()
         .isLength({ min: 3, max: 500 })
         .withMessage("Task description cannot be less than 3 characters and more than 500 characters"),
-    body("duedate")
+    body("dueDate")
         .optional({ nullable: true })
-        .isString().withMessage("Due date can only be in strings").bail()
         .isISO8601()
         .withMessage("Kindly provide a valid date format"),
     body("priority")
         .optional({ nullable: true })
         .trim()
-        .customSanitizer(value => normaliseLowerCase(value))
+        .customSanitizer(value => normaliseUpperCase(value))
         .isIn(allowedPriority).withMessage("Kindly select a valid task priority"),
 ]
 
@@ -65,7 +62,7 @@ const validateTaskStatus = [
         .isString()
         .withMessage("Task status can only be string")
         .bail()
-        .customSanitizer(value => normaliseLowerCase(value))
+        .customSanitizer(value => normaliseUpperCase(value))
         .isIn(allowedStatus)
         .withMessage("Invalid status selected")
 ]

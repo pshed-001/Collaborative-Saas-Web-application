@@ -2,23 +2,9 @@ import {
   generateAccessToken,
   loginUser,
   registerUser,
-  logout,
-  update
+  logout
 } from "./auth.service.js";
 
-
-export const updateUser = async (req, res, next) => {
-  try {
-    const up = await update()
-    console.log(up)
-    return res.status(201).json({
-      message: "successful",
-      newUsername: up
-    })
-  } catch (err) {
-    next(err)
-  }
-}
 
 export const register = async (req, res, next) => {
   try {
@@ -41,7 +27,7 @@ export const login = async (req, res, next) => {
       sameSite: "strict",
       secure: true,
       maxAge: 24 * 60 * 60 * 1000 * 3,
-      path: "/auth",
+      path: "/api/auth",
     });
     // const getExpire = jwt.decode(accessToken).exp;
 
@@ -74,7 +60,7 @@ export const accessTokenGenerator = async (req, res, next) => {
       httpOnly : true,
       sameSite : "strict",
       secure : true,
-      path : "/auth",
+      path : "/api/auth",
       maxAge : 1000 * 60 *60 * 24 * 3
     })
     res.setHeader("Authorization", `Bearer ${result.accessToken}`);

@@ -11,7 +11,7 @@ const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
       username: userInfo.username,
     },
     ACCESS_KEY,
-    { expiresIn: "15m" },
+    { expiresIn: "15m", algorithm : "HS256" },
   );
   const refreshToken = jwt.sign(
     {
@@ -19,7 +19,7 @@ const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
       username: userInfo.username,
     },
     REFRESH_KEY,
-    { expiresIn: "3d" },
+    { expiresIn: "3d" , algorithm : "HS256"},
   );
 
   return { accessToken, refreshToken };
@@ -27,8 +27,9 @@ const generateToken = (ACCESS_KEY, REFRESH_KEY, userInfo) => {
 
 // registering new user after collecting their credentials
 export async function registerUser(userInfo) {
+  const email = userInfo.email.toLowerCase().trim()
   const checkExistingUser = await prisma.user.findUnique({
-    where: { email: userInfo.email },
+    where: { email:email },
   });
   // checking if user already exists
   if (checkExistingUser) {
@@ -67,9 +68,10 @@ export async function registerUser(userInfo) {
 // Authenticating new user after providing credentials
 export async function loginUser(userInfo) {
   // querying db for matches
+  const username = userInfo.userInput.toLowerCase().trim()
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ email: userInfo.userInput }, { username: userInfo.userInput }],
+      OR: [{ email: username }, { username: username }],
     },
   });
 
@@ -152,7 +154,7 @@ export async function logout(request, response) {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
-    path: "/auth"
+    path: "/api/auth"
   });
   return {
     success : true,
@@ -164,23 +166,6 @@ export async function logout(request, response) {
     },
     message: "Successfully logged out"
   };
-}
-
-// update table records
-export async function update() {
-  try {
-    const updateRecord = await prisma.user.update({
-      where: {
-        username: "dev2",
-      },
-      data: {
-        username: "dev2@itgel",
-      },
-    });
-    return updateRecord.username
-  } catch (err) {
-    throw err
-  }
 }
 
 // add session mgmt and standard cookie rotation

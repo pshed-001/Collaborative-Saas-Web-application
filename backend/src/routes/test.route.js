@@ -6,7 +6,8 @@ const testRouter = express.Router();
 testRouter.get("/protected", authMiddleWare, (req, res)=>{
     res.status(200).json({
         message : "You are checked before giving access to this route.",
-        user : req.user
+        user : req.user,
+        details : req.body
     })
 })
 

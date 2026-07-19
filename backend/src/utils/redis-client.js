@@ -13,13 +13,13 @@ const redisConnect = createClient({
                 throw new Error("Max retry attempt reached")
             }
             const delay = 5000
-            console.log(`Redis retry attemp ${retries + 1} in {delay/1000}s`)
-            return delay
+            console.log(`Redis retry attempt ${retries + 1} in {delay/1000}s`)
+            return delay * retries - MAX_RETRIES
         }
     }
 })
 
-redisConnect.on("error", (err) => console.error("Error encounterede during initialising", err))
+redisConnect.on("error", (err) => console.error("Error encountered during initialising", err))
 
 try {
     await redisConnect.connect()

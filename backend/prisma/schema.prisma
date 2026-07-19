@@ -168,7 +168,7 @@ model Task {
   assignedTo   User?     @relation("AssignedTasks", fields: [assignedToId], references: [id])
   taskComments Comment[]
 
-  @@unique([title, workspaceId])
+  @@unique([title, workspaceId, isDeleted])
   @@index([workspaceId])
   @@index([assignedToId])
   @@index([completedById])

@@ -10,6 +10,7 @@ const globalSlowDown = slowDown({
     windowMs: 30 * 60 * 1000,
     delayAfter: 200,
     delayMs: (usedHits) => usedHits * 500,
+    maxDelayMs : 5000,
     store: redisStorage(redisConnect, "global-sd:")
 
 })
@@ -22,5 +23,5 @@ const globalLimiter = rateLimit({
     store: redisStorage(redisConnect, "global-rl:"),
     message: "Too many requests. Kindly wait while we process your request."
 })
-// export both limiter adn slow-down to be mounted globally
+// export both limiter and slow-down to be mounted globally
 export { globalLimiter, globalSlowDown }

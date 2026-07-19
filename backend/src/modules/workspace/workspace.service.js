@@ -194,33 +194,25 @@ async function getWorkspaceContent(userId, workspaceId) {
     });
 
     // destruturing and getting needed data from the workspace
-    const { id, name, description, mode, category, ownerId, createdAt } = workspace;
+    const { isDeleted, deletedAt, deletedBy, ...result } = workspace;
     //getting the role of the user 
     const role = membership?.role || null;
     // determining access level of the user
-    const accessLevel = role ? (role === "ADMIN" ? "ADMIN" : "MEMBER") : "VIEW_ONLY";
+    const accessLevel = result.role ? (role === "ADMIN" ? "ADMIN" : "MEMBER") : "VIEW_ONLY";
 
     // only public workspaces are visible for non members and 
     // private workspaces are not visible to non members unless you are an active member
     // checking access for private workspaces
-    if ((!membership || membership.status !== "ACTIVE") && mode === "PRIVATE") {
+    if ((!membership || membership.status !== "ACTIVE") && result.mode === "PRIVATE") {
       throw new AppError("User not authorised to access this resource", 403);
     }
 
     return {
       success: true,
       message: "Workspace fetched successfully",
-      data: {
-        id,
-        name,
-        description,
-        mode,
-        category,
-        ownerId: membership ? ownerId : null,
-        createdAt: createdAt.toISOString(),
-        role,
-        accessLevel,
-      }
+      data: result
+
+
     }
   } catch (err) {
     if (err.code === "P2025") {
@@ -346,7 +338,12 @@ async function getMembers(userId, workspaceId) {
         isDeleted: false
       },
       select: {
-        userId: true, role: true, status: isAdmin
+        userId: true, role: true, status: true,
+        user: {
+          select: {
+            id: true, firstname: true, lastname: true, username: true
+          }
+        }
       }
     })
     return {
@@ -479,7 +476,7 @@ async function updateWorkspace(userId, workspaceId, workspaceData) {
     if (Object.keys(updateData).length === 0) {
       throw new AppError("Kindly fill at least one field", 400)
     }
-    updateData.updatedBy = userId
+    updateData.updatedById = userId
     updateData.updatedAt = new Date();
 
 
@@ -516,7 +513,7 @@ async function deleteWorkspace(userId, workspaceId) {
     throw new AppError("Unauthorised access", 403)
   }
   const now = new Date();
-  const deleteData = { deletedAt: now, isDeleted: true, deletedBy: userId }
+  const deleteData = { deletedAt: now, isDeleted: true, deletedById: userId }
 
   // performing soft delete incase of recovery attempt 
   // and making use of transactions
@@ -723,7 +720,7 @@ async function updateUser(requesterId, targetUserId, workspaceId, newRole) {
 async function recoverWorkspace(userId, workspaceId) {
   try {
     // check if workspace exists 
-    const workspace = await checkWorkspace(workspaceId);
+    const workspace = await checkWorkspace(workspaceId, true);
     if (workspace.isDeleted === false) {
       throw new AppError("Workspace is not deleted", 400)
     }

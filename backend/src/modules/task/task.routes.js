@@ -12,6 +12,8 @@ import {
     validateTaskResult
 } from "./task.validator.js";
 
+import commentRouter from "../comments/comment.route.js";
+
 const taskRouter = express.Router({ mergeParams : true })
 
 // general static routes
@@ -23,11 +25,8 @@ taskRouter.get("/", taskCtrl.getAllTasksController)
 
 // routes that needs params and single nested params
 // crud routes 
-taskRouter.patch("/:taskId/complete", taskCtrl.completeTaskController)
-taskRouter.patch("/:taskId/cancel", taskCtrl.cancelTaskController)
-taskRouter.patch("/:taskId/reopen", taskCtrl.reopenTaskController)
 taskRouter.post("/:taskId/assign", taskCtrl.assignTaskController)
-taskRouter.post("/:taskId/submit", taskCtrl.submitTaskController)
+taskRouter.patch("/:taskId/status", validateTaskStatus, validateTaskResult, taskCtrl.updateTaskStatusController)
 
 //
 taskRouter.patch("/:taskId/restore", taskCtrl.restoreTaskController)
@@ -36,12 +35,7 @@ taskRouter.delete("/:taskId/permanent-delete", taskCtrl.deleteTaskPermanentlyCon
 
 
 // comments
-taskRouter.post("/:taskId/comments", taskCtrl.addTaskCommentController)
-taskRouter.get("/:taskId/comments", taskCtrl.getTasksCommentsController)
-
-// watching and unwatching a task
-taskRouter.post("/:taskId/watch", taskCtrl.watchTaskController)
-taskRouter.patch("/:taskId/unwatch", taskCtrl.unWatchTaskController)
+taskRouter.use("/:taskId/comments", commentRouter)
 
 // adding attachmenst and fetching them routes
 taskRouter.post("/:taskId/attachments", taskCtrl.uploadAttachmentController)

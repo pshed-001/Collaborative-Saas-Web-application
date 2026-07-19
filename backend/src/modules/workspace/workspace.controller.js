@@ -200,7 +200,7 @@ async function update(req, res, next) {
     try {
         const result = await updateWorkspace(req.user.id, req.params.workspaceId, req.body);
 
-        res.status(result.statusCode).json({
+        res.status(200).json({
             success: result.success,
             message: result.message,
             data: {

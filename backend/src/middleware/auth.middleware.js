@@ -14,7 +14,7 @@ export const authMiddleWare = (req, res, next) => {
     const JWT_ACCESS_SECRET_KEY = process.env.JWT_ACCESS_SECRET_KEY;
     const token = checkAuthorised.split(" ")[1];
     try{
-        const verifiedToken = jwt.verify(token, JWT_ACCESS_SECRET_KEY )
+        const verifiedToken = jwt.verify(token, JWT_ACCESS_SECRET_KEY , { algorithms : ["HS256"]})
         req.user = {
             id : verifiedToken.id,
             username : verifiedToken.username,
