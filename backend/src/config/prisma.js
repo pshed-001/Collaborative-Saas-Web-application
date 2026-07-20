@@ -8,18 +8,18 @@ const prisma = new PrismaClient({ adapter });
 
 const prisma = new PrismaClient()
 export default prisma; */
-
-import "dotenv/config";
-import { PrismaClient } from '../../generated/prisma/client.ts'; 
+import "dotenv/config"
+import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import pg from "pg"
-// Initialize the native PG pool
-const pool = new pg.Pool({ 
-  connectionString: process.env.DATABASE_URL 
+import { PrismaClient } from '../../generated/prisma/client.ts';
+
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  connectionTimeoutMillis: 10000, // Extend wait time to 10s before timing out
+  idleTimeoutMillis: 30000,       // Keep idle connections open for 30s
+  max: 20                         // Ensure your pool size matches your needs
 });
 
-// Wrap it with the Prisma 7 PostgreSQL adapter
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-
-export default prisma;
+export default prisma

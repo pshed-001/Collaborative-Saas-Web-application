@@ -4,9 +4,8 @@ import "dotenv/config"
 const MAX_RETRIES = parseInt(process.env.REDIS_RETRIES, 10) || 5
 
 const redisConnect = createClient({
+    url : process.env.REDIS_URL,
     socket: {
-        host: process.env.HOST,
-        port: process.env.REDIS_PORT,
         reconnectStrategy: (retries) => {
             if (retries >= MAX_RETRIES) {
                 console.error(`Redis max retry reached`)
