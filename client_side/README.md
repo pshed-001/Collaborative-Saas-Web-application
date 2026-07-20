@@ -1,16 +1,65 @@
-# React + Vite
+# ITGEL Client (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite frontend for the ITGEL collaborative workspace platform.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Prerequisites
 
-## React Compiler
+- Node.js 18+
+- The ITGEL backend must be running on port 8080 (or a port of your choice)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Backend `.env` requirement
 
-## Expanding the ESLint configuration
+For the frontend to communicate with the backend, add the following line to your **backend** `.env`:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```
+CLIENT_URL=http://localhost:5173
+```
+
+If you run the backend on a different port or need multiple allowed origins, use comma separation:
+
+```
+CLIENT_URL=http://localhost:5173,http://localhost:3000
+```
+
+**Note:** The frontend expects the backend to be running at `http://localhost:8080`. If your backend uses a different port, update the proxy settings in `vite.config.js`.
+
+### Install and run
+
+```bash
+npm install
+npm run dev
+```
+
+This starts the Vite dev server at `http://localhost:5173`. API requests to `/auth/*` and `/workspace/*` are automatically proxied to the backend.
+
+### Build for production
+
+```bash
+npm run build
+npm run preview
+```
+
+## Architecture
+
+- **React 19 + Vite** for build tooling
+- **CSS Modules + CSS custom properties** for styling (Ocean Depths theme)
+- **React Router v7** for routing
+- **TanStack Query v5** for server state management
+- **Zustand** for client state (auth, theme)
+- **React Hook Form + Zod** for form validation
+- **Axios** for HTTP with token refresh interceptor
+- **Framer Motion** for page/component transitions
+
+## Theme
+
+The app uses a deep teal-to-slate-blue color scheme called "Ocean Depths." All colors are defined as CSS custom properties in `src/tokens.css`, toggled via the `data-theme` attribute on the `<html>` element. Light/dark/system theme modes are supported and persisted to localStorage.
+
+## Hooks
+
+- `use-workspaces` — workspaces, join, leave, create, delete, recover
+- `use-members` — list, approve, reject, remove, role update
+- `use-tasks` — list, create, reassign
+
+All hooks integrate directly with TanStack Query for caching and invalidation.

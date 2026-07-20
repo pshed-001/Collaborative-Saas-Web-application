@@ -1,0 +1,24 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 500;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.initials {
+  background-color: rgba(10, 112, 117, 0.1);
+  color: var(--accent);
+}
+
+.img {
+  object-fit: cover;
+  border-radius: 9999px;
+}
+
+.sm { width: 28px; height: 28px; font-size: 10px; }
+.default_size { width: 36px; height: 36px; font-size: 12px; }
+.lg { width: 48px; height: 48px; font-size: 14px; }
+.xl { width: 64px; height: 64px; font-size: 16px; }

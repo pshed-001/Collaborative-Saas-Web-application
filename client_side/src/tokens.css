@@ -1,0 +1,125 @@
+/* ============================================================
+   Ocean Depths — Design Tokens
+   Toggled via [data-theme="light"|"dark"] on <html>
+   ============================================================ */
+
+:root {
+  /* Background & Surface */
+  --bg: #F1F7F7;
+  --surface: #FFFFFF;
+  --border: #DCE8E8;
+
+  /* Text */
+  --text-primary: #031716;
+  --text-secondary: #274D60;
+
+  /* Accent */
+  --accent: #0A7075;
+  --accent-secondary: #6BA3BE;
+
+  /* Semantic — deep saturated for light theme */
+  --success: #065F46;
+  --success-bg: #A7F3D0;
+  --success-border: #34D399;
+  --warning: #92400E;
+  --warning-bg: #FDE68A;
+  --warning-border: #FBBF24;
+  --error: #991B1B;
+  --error-bg: #FECACA;
+  --error-border: #F87171;
+  --accent-bg: #A5F3FC;
+  --accent-border: #22D3EE;
+
+  /* Presence palette */
+  --presence-1: #7C3AED;
+  --presence-2: #10B981;
+  --presence-3: #3B82F6;
+  --presence-4: #F97316;
+  --presence-5: #EC4899;
+
+  /* Derived (surface layers) */
+  --surface-elevated: #FFFFFF;
+  --surface-subtle: rgba(3, 23, 22, 0.03);
+  --surface-hover: rgba(3, 23, 22, 0.05);
+  --surface-active: rgba(10, 112, 117, 0.06);
+
+  /* Focus ring */
+  --ring: rgba(10, 112, 117, 0.4);
+
+  /* Input */
+  --input-border: #DCE8E8;
+  --input-bg: #FFFFFF;
+
+  /* Muted / placeholder */
+  --muted: #EDF2F2;
+  --muted-text: #5A7A85;
+
+  /* Overlay */
+  --overlay: rgba(3, 23, 22, 0.5);
+
+  /* Skeleton */
+  --skeleton-from: #EDF2F2;
+  --skeleton-via: #DCE8E8;
+  --skeleton-to: #EDF2F2;
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(3, 23, 22, 0.15);
+}
+
+[data-theme="dark"] {
+  /* Background & Surface */
+  --bg: #031716;
+  --surface: #032F30;
+  --border: #0A3A3A;
+
+  /* Text */
+  --text-primary: #EAF4F4;
+  --text-secondary: #6BA3BE;
+
+  /* Accent */
+  --accent: #0C969C;
+  --accent-secondary: #274D60;
+
+  /* Semantic (vivid on dark) */
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --success-border: rgba(16, 185, 129, 0.3);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-border: rgba(245, 158, 11, 0.3);
+  --error: #EF4444;
+  --error-bg: rgba(239, 68, 68, 0.12);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --accent-bg: rgba(12, 150, 156, 0.12);
+  --accent-border: rgba(12, 150, 156, 0.3);
+
+  /* Derived */
+  --surface-elevated: #043D3E;
+  --surface-subtle: rgba(234, 244, 244, 0.04);
+  --surface-hover: rgba(234, 244, 244, 0.06);
+  --surface-active: rgba(12, 150, 156, 0.1);
+
+  /* Focus ring */
+  --ring: rgba(12, 150, 156, 0.45);
+
+  /* Input */
+  --input-border: #0A3A3A;
+  --input-bg: #032F30;
+
+  /* Muted / placeholder */
+  --muted: #052626;
+  --muted-text: #6BA3BE;
+
+  /* Overlay */
+  --overlay: rgba(3, 23, 22, 0.7);
+
+  /* Skeleton */
+  --skeleton-from: #043D3E;
+  --skeleton-via: #0A3A3A;
+  --skeleton-to: #043D3E;
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(234, 244, 244, 0.12);
+}
