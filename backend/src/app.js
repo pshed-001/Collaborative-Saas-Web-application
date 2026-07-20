@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "node:path"
 import { fileURLToPath } from "node:url";
+import helmet from "helmet"
+
 import authRouter from "./modules/auth/auth.routes.js";
 import testRouter from "./routes/test.route.js";
 import workspaceRouter from "./modules/workspace/workspace.routes.js";
@@ -17,6 +19,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const app = express();
 
+app.use(helmet())
 //cors configuration
 app.use(
     cors({
