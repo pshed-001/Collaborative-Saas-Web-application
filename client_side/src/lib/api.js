@@ -1,14 +1,15 @@
 import axios from 'axios'
 import useAuthStore from '../stores/auth-store'
 
+const baseURL = import.meta.env.VITE_API_URL
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
 
 const refreshClient = axios.create({
-  baseURL: '/api',
+  baseURL,
   withCredentials: true,
 })
 
