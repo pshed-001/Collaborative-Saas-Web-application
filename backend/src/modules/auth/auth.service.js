@@ -68,7 +68,7 @@ export async function registerUser(userInfo) {
 // Authenticating new user after providing credentials
 export async function loginUser(userInfo) {
   // querying db for matches
-  const username = userInfo.userInput.toLowerCase().trim()
+  const username = userInfo.userInput
   const user = await prisma.user.findFirst({
     where: {
       OR: [{ email: username }, { username: username }],
