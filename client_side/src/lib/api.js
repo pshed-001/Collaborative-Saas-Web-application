@@ -3,13 +3,13 @@ import useAuthStore from '../stores/auth-store'
 
 const baseURL = import.meta.env.VITE_API_URL
 const api = axios.create({
-  baseURL,
+  baseURL : `${baseURL}/api`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
 
 const refreshClient = axios.create({
-  baseURL,
+  baseURL :`${baseURL}/api`,
   withCredentials: true,
 })
 
