@@ -153,7 +153,7 @@ export async function logout(request, response) {
   response.clearCookie("refreshToken", {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: "none",
     path: "/api/auth"
   });
   return {

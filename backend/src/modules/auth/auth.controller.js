@@ -24,7 +24,7 @@ export const login = async (req, res, next) => {
     // const accessToken = result.accessToken
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
       secure: true,
       maxAge: 24 * 60 * 60 * 1000 * 3,
       path: "/api/auth",
@@ -58,7 +58,7 @@ export const accessTokenGenerator = async (req, res, next) => {
     const result = await generateAccessToken(req.cookies.refreshToken);
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly : true,
-      sameSite : "strict",
+      sameSite : "none",
       secure : true,
       path : "/api/auth",
       maxAge : 1000 * 60 *60 * 24 * 3
