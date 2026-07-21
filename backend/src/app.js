@@ -19,7 +19,10 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const app = express();
 
+// helmet config
 app.use(helmet())
+// in other not to rate limit the cdn
+app.set('trust proxy', 1)
 //cors configuration
 app.use(
     cors({
