@@ -22,7 +22,7 @@ const app = express();
 // helmet config
 app.use(helmet())
 // in other not to rate limit the cdn
-app.set('trust proxy', 1)
+app.set('trust proxy', true)
 //cors configuration
 app.use(
     cors({
