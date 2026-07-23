@@ -3,14 +3,20 @@
 }
 
 .list {
-  display: inline-flex;
+  display: flex;
   height: 40px;
   align-items: center;
-  justify-content: center;
   border-radius: 10px;
   background-color: var(--muted);
   padding: 4px;
   gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
 }
 
 .trigger {

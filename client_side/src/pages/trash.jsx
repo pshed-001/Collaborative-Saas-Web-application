@@ -37,7 +37,7 @@ function TrashItem({ workspace }) {
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <Card>
           <CardContent style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{workspace.name}</h3>
                 {workspace.description && <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{workspace.description}</p>}

@@ -103,7 +103,7 @@ function CommentItem({ comment, workspaceId, taskId, currentUserId, isAdmin, onD
                 onChange={e => setReplyContent(e.target.value)}
                 placeholder={`Reply to @${comment.author?.username}...`}
                 rows={2}
-                style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--input-bg)', color: 'var(--text-primary)', fontSize: 13, resize: 'vertical', fontFamily: 'inherit' }}
+                style={{ flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--input-bg)', color: 'var(--text-primary)', fontSize: 13, resize: 'vertical', fontFamily: 'inherit' }}
               />
               <button
                 onClick={handleReply}

@@ -1,18 +1,19 @@
 import app from "./src/app.js"
 import "dotenv/config"
+import logger from "./src/utils/logger/logger.js"
 
 const host = process.env.HOST || "0.0.0.0"
 const port = process.env.PORT || 8080
 
 const server = app.listen(port, host, () => {
-    console.log(`Server started listening on http://${host}:${port}`)
+        logger.info(`Server started listening`, {"activity" : "Server initialisation"})
 })
 
 
 process.on("SIGTERM", () => {
-    console.log("SIGTERM request received, processing server shutdown")
+    logger.info("SIGTERM request received, processing server shutdown")
     server.close(() => {
-        console.log("Http server closed")
+        logger.log("Http server closed")
         process.exit(0)
     })
 })

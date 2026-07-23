@@ -31,8 +31,15 @@ export default function Dashboard() {
   return (
     <AnimatedPage>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <style>{`
+          @media (max-width: 640px) {
+            .dash-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+            .dash-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+
         {/* Header */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="dash-header" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>My Workspaces</h1>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '4px' }}>Manage your collaborative workspaces</p>
@@ -88,7 +95,7 @@ export default function Dashboard() {
 
         {/* Workspace list */}
         {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+          <div className="dash-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
             {[1, 2, 3].map((i) => (
               <Card key={i}><CardContent style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -120,7 +127,8 @@ export default function Dashboard() {
             variants={list}
             initial="initial"
             animate="animate"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}
+            className="dash-grid"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}
           >
             {filtered.map((ws, i) => (
               <motion.div key={ws.workspaceId || i} variants={item}>

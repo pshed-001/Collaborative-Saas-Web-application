@@ -127,7 +127,8 @@ export default function TaskDetail() {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16,
           cursor: 'pointer', color: 'var(--text-secondary)', background: 'none',
-          border: 'none', fontSize: 14, padding: 0,
+          border: 'none', fontSize: 14, padding: 0, maxWidth: '100%',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}
       >
         <ArrowLeft size={16} /> Back to {workspace?.name || 'Workspace'}

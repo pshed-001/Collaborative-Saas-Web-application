@@ -155,7 +155,7 @@ function InviteLink({ workspaceId, mode }) {
   return (
     <Card>
       <CardContent style={{ padding: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Share Invite Link</p>
             <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
@@ -212,7 +212,7 @@ function MembersSection({ workspaceId, data, loading, isAdmin, currentUserId, ow
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {pending.map(m => (
-              <div key={m.id || m.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 12, border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+              <div key={m.id || m.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 12, border: '1px solid var(--border)', backgroundColor: 'var(--surface)', gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Avatar firstname={m.user?.firstname} lastname={m.user?.lastname} size="sm" />
                   <div>
@@ -238,7 +238,7 @@ function MembersSection({ workspaceId, data, loading, isAdmin, currentUserId, ow
           const canRemove = isAdmin && !isTargetOwner && !isSelf
           const canChangeRole = currentUserId === ownerId && !isTargetOwner && !isSelf
           return (
-            <div key={m.id || m.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 12, border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+            <div key={m.id || m.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 12, border: '1px solid var(--border)', backgroundColor: 'var(--surface)', gap: 8, flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Avatar firstname={m.user?.firstname} lastname={m.user?.lastname} size="sm" />
                 <div>
@@ -544,8 +544,8 @@ export default function WorkspaceDetail() {
   if (isLoading) {
     return <AnimatedPage>
       <Skeleton style={{ width: 200, height: 20 }} />
-      <Skeleton style={{ width: 400, height: 16, marginTop: 8 }} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 24 }}>
+      <Skeleton style={{ maxWidth: 400, width: '100%', height: 16, marginTop: 8 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginTop: 24 }}>
         <Skeleton style={{ height: 120, borderRadius: 12 }} />
         <Skeleton style={{ height: 120, borderRadius: 12 }} />
         <Skeleton style={{ height: 120, borderRadius: 12 }} />

@@ -76,7 +76,7 @@ export default function Discover() {
         </div>
 
         {isLoading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
             {[1, 2, 3].map((i) => (
               <div key={i} style={{ borderRadius: "12px", border: "1px solid var(--border)", backgroundColor: "var(--surface)", padding: "20px" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -99,7 +99,7 @@ export default function Discover() {
             variants={list}
             initial="initial"
             animate="animate"
-            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}
           >
             {filtered.map((ws, i) => {
               const isOwner = ws.ownerId === user?.id
