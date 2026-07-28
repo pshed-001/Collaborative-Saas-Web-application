@@ -167,7 +167,7 @@ export default function CommentSection({ workspaceId, taskId, currentUserId, isA
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-          <Avatar firstname={useAuthStore.getState().user?.firstname} lastname={useAuthStore.getState().user?.lastname} size="sm" />
+          <Avatar firstname={useAuthStore(s => s.user?.firstname)} lastname={useAuthStore(s => s.user?.lastname)} size="sm" />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <textarea
               value={content}

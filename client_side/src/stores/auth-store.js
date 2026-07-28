@@ -23,6 +23,7 @@ const useAuthStore = create((set) => ({
   accessToken: null,
   isLoading: true,
   isAuthenticated: false,
+  maintenanceMode: false,
 
   setAuth: (user, accessToken) => {
     saveUser(user)
@@ -30,6 +31,8 @@ const useAuthStore = create((set) => ({
   },
 
   setAccessToken: (accessToken) => set({ accessToken }),
+
+  setMaintenanceMode: (maintenanceMode) => set({ maintenanceMode }),
 
   logout: () => {
     saveUser(null)

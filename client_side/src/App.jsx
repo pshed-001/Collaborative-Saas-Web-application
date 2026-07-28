@@ -21,13 +21,15 @@ const TaskDetail = lazy(() => import('./pages/task-detail'))
 const Trash = lazy(() => import('./pages/trash'))
 const Profile = lazy(() => import('./pages/profile'))
 const NotFound = lazy(() => import('./pages/not-found'))
+const Maintenance = lazy(() => import('./pages/maintenance'))
 
+const maintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (count, err) => {
-        if (err?.status === 429) return false
-        return count < 2
+        if (err?.response?.status === 429) return false
+        count < 2
       },
       refetchOnWindowFocus: false,
     },
@@ -106,6 +108,7 @@ function AppRoutes() {
 
 function AppInit() {
   const [ready, setReady] = useState(false)
+  const maintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
   useEffect(() => {
     let cancelled = false
@@ -132,10 +135,25 @@ function AppInit() {
 
   if (!ready) return <SplashScreen />
 
+  if (maintenanceMode) {
+    return (
+      <Suspense fallback={<SplashScreen />}>
+        <Maintenance />
+      </Suspense>
+    )
+  }
+
   return <AppRoutes />
 }
 
 export default function App() {
+  if (maintenanceMode === 'true') {
+    return (
+      <ErrorBoundary>
+        <Maintenance />
+      </ErrorBoundary>
+    )
+  }
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>

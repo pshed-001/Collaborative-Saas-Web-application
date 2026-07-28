@@ -12,16 +12,20 @@ const SLIDE_IMAGES = [
 export default function SlideshowBackground({ className }) {
   const [index, setIndex] = useState(0)
   const [prev, setPrev] = useState(0)
+  const indexRef = useRef(0)
   const intervalRef = useRef(null)
   const resolvedTheme = useThemeStore(s => s.resolvedTheme)
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setPrev(index)
-      setIndex(i => (i + 1) % SLIDE_IMAGES.length)
+      const current = indexRef.current
+      const next = (current + 1) % SLIDE_IMAGES.length
+      indexRef.current = next
+      setPrev(current)
+      setIndex(next)
     }, 2000)
     return () => clearInterval(intervalRef.current)
-  }, [index])
+  }, [])
 
   const overlay = resolvedTheme === 'dark'
     ? 'linear-gradient(135deg, rgba(3,23,22,0.82) 0%, rgba(3,23,22,0.5) 40%, rgba(10,112,117,0.18) 100%)'

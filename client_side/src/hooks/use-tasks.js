@@ -109,7 +109,7 @@ export function useUpdateTaskStatus(workspaceId) {
     mutationFn: ({ taskId, status }) => apiPatch(`/workspace/${workspaceId}/tasks/${taskId}/status`, { status }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tasks', workspaceId] })
-      qc.invalidateQueries({ queryKey: ['task'] })
+      qc.invalidateQueries({ queryKey: ['task', workspaceId, taskId] })
       toast.success('Status updated')
     },
     onError: (err) => {

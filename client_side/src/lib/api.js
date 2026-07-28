@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL : `${baseURL}/api`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
+  timeout : 5000
 })
 
 const refreshClient = axios.create({
@@ -81,6 +82,7 @@ export function getErrorMessage(err) {
 
   if (status === 500) return 'Something went wrong. Please try again.'
   if (status === 404) return 'Resource not found.'
+  if (status === 503) return 'Service is temporarily unavailable. Please try again later.'
 
   const backendMsg = err?.response?.data?.message || err?.message
   if (Array.isArray(backendMsg)) {

@@ -5,12 +5,12 @@ import path from "node:path"
 import { fileURLToPath } from "node:url";
 import helmet from "helmet"
 
-import authRouter from "./modules/auth/auth.routes.js";
-import testRouter from "./routes/test.route.js";
-import workspaceRouter from "./modules/workspace/workspace.routes.js";
+import authRouter from "../modules/auth/auth.routes.js";
+import testRouter from "../routes/test.route.js";
+import workspaceRouter from "../modules/workspace/workspace.routes.js";
 
-import { errorhandler } from "./middleware/error.middleware.js";
-import { globalSlowDown, globalLimiter } from "./middleware/ratelimit/globalLimiter.js"
+import { errorhandler } from "../middleware/error.middleware.js";
+import { globalSlowDown, globalLimiter } from "../middleware/ratelimit/globalLimiter.js"
 
 const allowedOrigins = process.env.CLIENT_URL
     ? process.env.CLIENT_URL.split(",").map(url => url.trim())
@@ -37,6 +37,8 @@ app.use(express.static(path.join(__dirname, "../../client_side/dist")))
 app.use(cookieParser());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+
+//limiter and slowdown
 app.use(globalSlowDown) //global slowdown
 app.use(globalLimiter)  // Global rate limit
 
