@@ -2,7 +2,7 @@
 
 A full-stack team workspace and project management platform. Users create or join public/private workspaces, manage memberships and roles, create and assign tasks through a status workflow, and discuss work through threaded comments — all secured behind a JWT access/refresh authentication layer with Redis-backed rate limiting.
 
-Built by **Albert / ITGEL** (Infinite Technology Global Enterprise Limited) as a portfolio-grade demonstration of backend architecture and application-security practice, layered on top of a polished React frontend.
+Built by **Philip shedrack(pshed-001) **  as a portfolio-grade demonstration of backend architecture and application-security practice, layered on top of a polished React frontend.
 
 > **Repository layout:** this is a monorepo with two independently-run packages — `backend/` (Node.js/Express API) and `client_side/` (React/Vite SPA) — served together in production from a single Express process.
 
