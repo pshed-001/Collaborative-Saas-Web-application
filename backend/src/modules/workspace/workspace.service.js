@@ -407,7 +407,7 @@ async function rejectUser(requesterId, workspaceId, targetUserId) {
   try {
     await checkWorkspace(workspaceId);
 
-    // enduring that user cannot reject themselves
+    // ensuring that user cannot reject themselves
     if (requesterId === targetUserId) {
       throw new AppError("Cannot reject yourself", 400)
     }
@@ -415,27 +415,25 @@ async function rejectUser(requesterId, workspaceId, targetUserId) {
     await validateUserAdmin(requesterId, workspaceId)
 
     const checkReq = await getMembership(targetUserId, workspaceId);
-    if (!checkReq) {
+    if (!checkReq || checkReq.isDeleted || checkReq.status !== "PENDING") {
       throw new AppError("User is not in pending state", 409)
     }
     /*
     if (checkReq.status !== "PENDING") {
       throw new AppError("Invalid state", 409)
     }*/
-    // checking the db for pending request adn rejecting it
-    const update = await prisma.membership.delete({
+    // checking the db for pending request and rejecting it
+    const update = await prisma.membership.update({
       where: {
-        userId: targetUserId, workspaceId: workspaceId, isDeleted: false,
-        status: "PENDING"
+        userId_workspaceId: {
+          userId: targetUserId,
+          workspaceId
+        }
       },
       data: {
         status: "REJECTED"
       }
     })
-    // verifying the count of peending result against 0
-    if (update.count === 0) {
-      throw new AppError("User is not in pending state", 409)
-    }
     return {
       success: true,
       message: "User rejected successfully",
