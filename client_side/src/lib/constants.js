@@ -6,7 +6,7 @@ export const CATEGORIES = [
   { value: 'software engineering', label: 'Software Engineering' },
   { value: 'web development', label: 'Web Development' },
   { value: 'mobile development', label: 'Mobile Development' },
-  { value: ' data science', label: 'Data Science' },
+  { value: 'data science', label: 'Data Science' },
   { value: 'ai', label: 'AI' },
   { value: 'machine learning', label: 'Machine Learning' },
   { value: 'product management', label: 'Product Management' },
@@ -22,7 +22,7 @@ export const CATEGORIES = [
   { value: 'devops', label: 'DevOps' },
   { value: 'cyber security', label: 'Cyber Security' },
   { value: 'ethical hacking', label: 'Ethical Hacking' },
-  { value: 'reconnaisance', label: 'Reconnaissance' },
+  { value: 'reconnaissance', label: 'Reconnaissance' },
   { value: 'penetration testing', label: 'Penetration Testing' },
   { value: 'default', label: 'General' },
 ]

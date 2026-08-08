@@ -13,11 +13,17 @@ const myFormat = printf(({ level, message, timestamp, ...meta }) => {
         : "";
     return `[${level}] ${timestamp} ${message} ${metaString}`
 })
-export const customLogger = () => {
+const customLogger = () => {
     return createLogger({
         level: "debug",
         format: combine(timestamp(), myFormat),
-        transports: [new transports.File({ filename: path.join(__dirname, "../../../log/logger.log") })]
+        transports: [
+            new transports.File({ filename: path.join(__dirname, "../../../log/logger.log") }),
+            new transports.Console()
+        ]
     })
 }
 
+const logger = customLogger()
+export default logger
+//
