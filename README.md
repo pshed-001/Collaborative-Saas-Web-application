@@ -573,7 +573,7 @@ npm run build
 
 ## Known Limitations & Roadmap
 
-This section is included deliberately, based on a full read-through of the codebase, so the project's real state is documented rather than glossed over:
+This section is included deliberately,  so the project's real state is documented rather than glossed over:
 
 - **Settings module is an empty scaffold.** `backend/src/modules/settings/*.js` exist but contain no code and are not mounted in `mainApp.js`.
 - **Task attachments and activity logs are stubbed.** The routes exist (`POST/DELETE .../attachments`, `GET .../activity-logs`) and are wired into `task.routes.js`, but their controllers and service functions are empty function bodies — calling them will not error, but they do nothing.
@@ -586,13 +586,6 @@ This section is included deliberately, based on a full read-through of the codeb
 - **Some debug `console.log`/`console.error` calls remain** in service code (e.g. `workspace.service.js`, `task.service.js`) alongside the structured Winston logger — worth consolidating before production hardening.
 - **Root and client `README.md` files predate the current implementation** (the root README still describes SQLite and an "empty" frontend); this document supersedes them.
 
-### Suggested next steps
-1. Implement or remove the settings module and the attachment/activity-log endpoints.
-2. Fix the `rejectUser` Prisma call and add the missing `@@unique` for permanent task deletion, or rewrite that query.
-3. Delete the two dead files under `backend/src/routes/`.
-4. Add integration tests around the auth flow, membership guardrails (last-admin protection), and task status transition rules — these are the highest-risk, most logic-dense areas of the codebase.
-5. Add a `Dockerfile`/`docker-compose.yml` for Postgres + Redis + API to simplify local onboarding, and a minimal CI workflow (lint + build) on push.
-6. Commit `.env.example` files for both packages.
 
 ---
 
