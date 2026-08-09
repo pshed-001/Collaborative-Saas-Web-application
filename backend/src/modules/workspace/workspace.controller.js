@@ -6,7 +6,6 @@ import {
     updateWorkspace, workspaceCreator
 } from "./workspace.service.js";
 
-
 // date string for timestamps 
 const now = new Date().toISOString()
 
@@ -331,7 +330,6 @@ async function delUserWorkspacePermanently(req, res, next) {
     const now = new Date().toISOString()
     try {
         const result = await deleteWorkspacePermanently(req.user.id, req.params.workspaceId)
-
         res.status(200).json({
             success: result.success,
             message: result.message,

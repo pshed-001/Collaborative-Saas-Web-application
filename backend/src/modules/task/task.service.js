@@ -532,22 +532,25 @@ async function updateTaskStatus(userId, workspaceId, taskId, taskStatus) {
 }
 async function deleteTaskPermanently(userId, taskId, workspaceId) {
     try {
-        //npot function yet :
         // you have to move : from attachemdnts to comment to task
-        await taskRules(true, taskId, userId, workspaceId);
+        await taskRules(taskId, userId, workspaceId, {}, true, true)
 
-        await prisma.task.delete({
-            where: {
-                id_workspaceId: {
-                    id: taskId,
-                    workspaceId,
-                },
-            },
-        });
+        await prisma.$transaction([
+            prisma.comment.deleteMany({
+                where : {
+                    taskId
+                }
+            }),
+            prisma.task.delete({
+                where : {
+                    id : taskId
+                }
+            })
+        ])
         return {
             success: true,
             message: "Task permanently deleted",
-            data: {},
+            data: null,
         };
     } catch (err) {
         throw err;

@@ -46,9 +46,9 @@ const validateUserAdmin = async (requesterId, workspaceId) => {
 }
 
 // check if a task exists in the workspace 
-const checkTask = async (taskId, workspaceId, taskOption = {}) => {
+const checkTask = async (taskId, workspaceId, taskOption = {}, isDeleted = false) => {
   const task = await prisma.task.findFirst({
-    where: { id: taskId, workspaceId: workspaceId, isDeleted: false, ...taskOption.where },
+    where: { id: taskId, workspaceId: workspaceId, isDeleted, ...taskOption.where },
     include: taskOption?.include,
   });
   if (!task) {
@@ -57,7 +57,7 @@ const checkTask = async (taskId, workspaceId, taskOption = {}) => {
   return task;
 }
 
-const taskRules = async ( taskId, userId, workspaceId, taskOptions = {},requireAdmin = false) => {
+const taskRules = async ( taskId, userId, workspaceId, taskOptions = {},requireAdmin = false, isDeleted = false) => {
   // all function throw err if encountered 
   // and they are caught and handled by the error middleware
   const [workspace, membership, task] = await Promise.all([
@@ -65,7 +65,7 @@ const taskRules = async ( taskId, userId, workspaceId, taskOptions = {},requireA
     requireAdmin ?
       validateUserAdmin(userId, workspaceId) :
       getMembership(userId, workspaceId),
-    checkTask(taskId, workspaceId, taskOptions)
+    checkTask(taskId, workspaceId, taskOptions, isDeleted)
   ])
 
   return { workspace, membership, task };

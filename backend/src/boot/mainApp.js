@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import path from "node:path"
 import { fileURLToPath } from "node:url";
 import helmet from "helmet"
-
+import dotenv from "dotenv"
 import authRouter from "../modules/auth/auth.routes.js";
 import testRouter from "../routes/test.route.js";
 import workspaceRouter from "../modules/workspace/workspace.routes.js";
@@ -12,6 +12,11 @@ import workspaceRouter from "../modules/workspace/workspace.routes.js";
 import { errorhandler } from "../middleware/error.middleware.js";
 import { globalSlowDown, globalLimiter } from "../middleware/ratelimit/globalLimiter.js"
 
+const envPath = process.env.NODE_ENV === "development" ?
+    ".env.development" : ".env"
+dotenv.config({
+    path: envPath
+})
 const allowedOrigins = process.env.CLIENT_URL
     ? process.env.CLIENT_URL.split(",").map(url => url.trim())
     : [];

@@ -589,7 +589,7 @@ async function leaveWorkspace(userId, workspaceId) {
         }
       },
       data: {
-        status: "LEFT", role: null
+        status: "LEFT", role: "MEMBER"
       }
     })
   })
@@ -657,7 +657,7 @@ async function removeUser(userId, targetUserId, workspaceId) {
         }
       },
       data: {
-        status: "REMOVED", role: null
+        status: "REMOVED", role: "MEMBER"
       }
     })
   })
@@ -769,7 +769,7 @@ async function recoverWorkspace(userId, workspaceId) {
 // delete workspace permanaently
 async function deleteWorkspacePermanently(userId, workspaceId) {
   // checking if workspace exists
-  const workspace = await checkWorkspace(workspaceId)
+  const workspace = await checkWorkspace(workspaceId, true)
 
   // ensuring only owner can delete workspace
   if (workspace.ownerId !== userId) {
@@ -778,19 +778,26 @@ async function deleteWorkspacePermanently(userId, workspaceId) {
   // making use of transactions to make sure that all related data is deleted at the same 
   // time to prevent orphan data and maintain data integrity
   await prisma.$transaction([
-    prisma.membership.delete({
+    prisma.comment.deleteMany({
       where: {
-        workspaceId: workspaceId
+        task: {
+          workspaceId
+        }
+      }
+    }),
+    prisma.task.deleteMany({
+      where: {
+        workspaceId
+      }
+    }),
+    prisma.membership.deleteMany({
+      where: {
+        workspaceId
       }
     }),
     prisma.workspace.delete({
       where: {
         id: workspaceId
-      }
-    }),
-    prisma.task.delete({
-      where: {
-        workspaceId: workspaceId
       }
     })
 

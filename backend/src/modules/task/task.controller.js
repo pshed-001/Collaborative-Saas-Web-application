@@ -95,7 +95,7 @@ async function deleteTaskController(req, res, next) {
         const data = req.body
         const result = await taskService.deleteTask(userId, taskId, workspaceId)
 
-        res.status(201).json({
+        res.status(200).json({
             success: result.success,
             message: result.message,
             data: {
@@ -199,6 +199,20 @@ async function updateTaskStatusController(req, res, next) {
 
 async function deleteTaskPermanentlyController(req, res, next) {
     try {
+        const userId = req.user.id
+        const { workspaceId, taskId } = req.params
+
+        const result = await taskService.deleteTaskPermanently(userId, taskId, workspaceId)
+        res.status(200).json({
+            success: result.success,
+            message: result.message,
+            data: {
+                payload: result.data,
+                metadata: {
+                    timestamp: new Date()
+                }
+            }
+        })
     } catch (err) {
         next(err);
     }
