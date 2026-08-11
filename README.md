@@ -597,4 +597,4 @@ This section is included deliberately,  so the project's real state is documente
 
 ## License
 
-MIT — as declared in `backend/package.json`. Author: **ITGEL** (Infinite Technology Global Enterprise Limited).
+MIT — . Author: **pshed-001(Philip Shedrack)**
