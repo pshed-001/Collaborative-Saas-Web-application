@@ -42,12 +42,9 @@ Built by **Philip shedrack(pshed-001) **  as a portfolio-grade demonstration of 
 | Rate limiting (Redis-backed, per-route) | ✅ Implemented |
 | Frontend (all core pages, theming, forms) | ✅ Implemented |
 | Maintenance-mode kill switch | ✅ Implemented |
-| Task attachments | 🚧 Route stubs only |
 | Per-task activity log | 🚧 Route stub only |
-| Forgot-password flow | 🚧 Placeholder file, not built |
 | Settings module | 🚧 Empty scaffold |
-| Automated tests | ❌ Not present |
-| CI/CD, Docker | ❌ Not present |
+| Automated tests | Postman Testing|
 
 ---
 
