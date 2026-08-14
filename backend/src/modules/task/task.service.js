@@ -532,11 +532,11 @@ async function updateTaskStatus(userId, workspaceId, taskId, taskStatus) {
 }
 async function deleteTaskPermanently(userId, taskId, workspaceId) {
     try {
-        // you have to move : from attachemdnts to comment to task
+        // you have to move : from attachments to comment to task
         const [workspace, membership, task] = await taskRules(taskId, userId, workspaceId, {}, false, true)
         
-        if(task.createdById !== userId) && (membership.role !== "ADMIN"){
-            throw new AppError("User do not have the permission to permanently delete this task", 403)
+        if((task.createdById !== userId) && (membership.role !== "ADMIN")){
+            throw new AppError("User does not have the permission to permanently delete this task", 403)
         }
         await prisma.$transaction([
             prisma.comment.deleteMany({
