@@ -2,7 +2,9 @@ import axios from 'axios'
 import useAuthStore from '../stores/auth-store'
 
 const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
-const baseURL = import.meta.env.DEV ? '/api' : `${apiBase}/api`
+const currentOrigin = typeof window !== 'undefined' ? window.location.origin.replace(/\/+$/, '') : ''
+const isSameOrigin = !apiBase || apiBase.toLowerCase() === currentOrigin.toLowerCase()
+const baseURL = (import.meta.env.DEV || isSameOrigin) ? '/api' : `${apiBase}/api`
 const api = axios.create({
   baseURL,
   withCredentials: true,
