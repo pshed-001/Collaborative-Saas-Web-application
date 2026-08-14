@@ -533,7 +533,7 @@ async function updateTaskStatus(userId, workspaceId, taskId, taskStatus) {
 async function deleteTaskPermanently(userId, taskId, workspaceId) {
     try {
         // you have to move : from attachemdnts to comment to task
-        await taskRules(taskId, userId, workspaceId, {}, true, true)
+        await taskRules(taskId, userId, workspaceId, {}, false, true)
 
         await prisma.$transaction([
             prisma.comment.deleteMany({
