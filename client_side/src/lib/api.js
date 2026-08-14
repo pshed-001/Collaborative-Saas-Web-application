@@ -7,12 +7,13 @@ const api = axios.create({
   baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
-  timeout : 5000
+  timeout : 30000
 })
 
 const refreshClient = axios.create({
   baseURL,
   withCredentials: true,
+  timeout: 30000
 })
 
 api.interceptors.request.use((config) => {
@@ -45,7 +46,7 @@ api.interceptors.response.use(
       isRefreshing = true
       try {
         const res = await refreshClient.post('/auth/refresh')
-        const auth = res.headers['authorization']
+        const auth = res.headers.get?.('Authorization') || res.headers.get?.('authorization') || res.headers['authorization']
         const newToken = auth ? auth.replace(/^Bearer\s+/i, '') : null
         if (newToken) {
           useAuthStore.getState().setAccessToken(newToken)
@@ -95,7 +96,7 @@ export function getErrorMessage(err) {
 }
 
 function extractToken(res) {
-  const auth = res.headers['authorization']
+  const auth = res.headers.get?.('Authorization') || res.headers.get?.('authorization') || res.headers['authorization']
   return auth ? auth.replace(/^Bearer\s+/i, '') : null
 }
 
