@@ -79,6 +79,21 @@ export function useDeleteTask(workspaceId) {
   })
 }
 
+export function usePermanentDeleteTask(workspaceId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (taskId) => apiDelete(`/workspace/${workspaceId}/tasks/${taskId}/permanent-delete`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['tasks', workspaceId] })
+      qc.invalidateQueries({ queryKey: ['deletedTasks', workspaceId] })
+      toast.success('Task permanently deleted')
+    },
+    onError: (err) => {
+      toast.error('Failed to permanently delete task', getErrorMessage(err))
+    },
+  })
+}
+
 export function useRestoreTask(workspaceId) {
   const qc = useQueryClient()
   return useMutation({
@@ -107,9 +122,9 @@ export function useUpdateTaskStatus(workspaceId) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ taskId, status }) => apiPatch(`/workspace/${workspaceId}/tasks/${taskId}/status`, { status }),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['tasks', workspaceId] })
-      qc.invalidateQueries({ queryKey: ['task', workspaceId, taskId] })
+      qc.invalidateQueries({ queryKey: ['task', workspaceId, variables.taskId] })
       toast.success('Status updated')
     },
     onError: (err) => {

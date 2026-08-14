@@ -1,16 +1,17 @@
 import axios from 'axios'
 import useAuthStore from '../stores/auth-store'
 
-const baseURL = import.meta.env.VITE_API_URL
+const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
+const baseURL = import.meta.env.DEV ? '/api' : `${apiBase}/api`
 const api = axios.create({
-  baseURL : `${baseURL}/api`,
+  baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout : 5000
 })
 
 const refreshClient = axios.create({
-  baseURL :`${baseURL}/api`,
+  baseURL,
   withCredentials: true,
 })
 

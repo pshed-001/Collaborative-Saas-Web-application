@@ -20,7 +20,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogFooter, ConfirmDialog } from '
 import { DropdownMenu, DropdownTrigger, DropdownContent, DropdownItem, DropdownSeparator } from '../components/ui/dropdown-menu'
 import { useWorkspaceDetail, useLeaveWorkspace, useJoinWorkspace, useDeleteWorkspace, useUpdateWorkspace } from '../hooks/use-workspaces'
 import { useMembers, useApproveMember, useRejectMember, useRemoveMember, useUpdateMemberRole } from '../hooks/use-members'
-import { useTasks, useCreateTask, useReassignTask, useDeleteTask, useDeletedTasks, useRestoreTask, useUpdateTaskStatus } from '../hooks/use-tasks'
+import { useTasks, useCreateTask, useReassignTask, useDeleteTask, usePermanentDeleteTask, useDeletedTasks, useRestoreTask, useUpdateTaskStatus } from '../hooks/use-tasks'
 import useAuthStore from '../stores/auth-store'
 import { CATEGORIES, TASK_STATUSES, TASK_PRIORITIES, MEMBERSHIP_ROLES } from '../lib/constants'
 import { timeAgo, truncate } from '../lib/utils'
@@ -400,8 +400,12 @@ function TaskCard({ task, workspaceId, activeMembers, onReassign, onDelete, onSt
                     </span>
                   </DropdownItem>
                 ))}
-                <DropdownSeparator />
-                <DropdownItem onClick={() => onDelete?.(task.id)} style={{ color: 'var(--error)' }}><Trash2 size={14} />Delete</DropdownItem>
+                {canManage && (
+                  <>
+                    <DropdownSeparator />
+                    <DropdownItem onClick={() => onDelete?.(task.id)} style={{ color: 'var(--error)' }}><Trash2 size={14} />Delete</DropdownItem>
+                  </>
+                )}
               </DropdownContent>
             </DropdownMenu>
           )}
@@ -485,6 +489,8 @@ function ReassignTask({ open, onClose, task, members, reassign }) {
 
 function TrashSection({ workspaceId, data, loading, isOwner, isAdmin, currentUserId }) {
   const restoreTask = useRestoreTask(workspaceId)
+  const permanentDeleteTask = usePermanentDeleteTask(workspaceId)
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   if (loading) return <div><Skeleton style={{ height: 200, borderRadius: 12 }} /></div>
 
@@ -516,17 +522,34 @@ function TrashSection({ workspaceId, data, loading, isOwner, isAdmin, currentUse
                       <span>Deleted {timeAgo(task.updatedAt || task.createdAt)}</span>
                     </div>
                   </div>
-                  {canRestore && (
-                    <Button size="sm" variant="outline" onClick={() => restoreTask.mutate(task.id)} disabled={restoreTask.isPending}>
-                      <Check size={14} /> Restore
-                    </Button>
-                  )}
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    {canRestore && (
+                      <Button size="sm" variant="outline" onClick={() => restoreTask.mutate(task.id)} disabled={restoreTask.isPending}>
+                        <Check size={14} /> Restore
+                      </Button>
+                    )}
+                    {canRestore && (
+                      <Button size="sm" variant="destructive" onClick={() => setDeleteTarget(task.id)} disabled={permanentDeleteTask.isPending}>
+                        <Trash2 size={14} /> Delete
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             )
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => permanentDeleteTask.mutate(deleteTarget, { onSuccess: () => setDeleteTarget(null) })}
+        title="Permanently Delete Task"
+        description="This will permanently delete the task. This action cannot be undone."
+        confirmLabel="Delete Permanently"
+        loading={permanentDeleteTask.isPending}
+      />
     </div>
   )
 }

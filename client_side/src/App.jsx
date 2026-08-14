@@ -23,13 +23,13 @@ const Profile = lazy(() => import('./pages/profile'))
 const NotFound = lazy(() => import('./pages/not-found'))
 const Maintenance = lazy(() => import('./pages/maintenance'))
 
-const maintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE
+const maintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (count, err) => {
         if (err?.response?.status === 429) return false
-        count < 2
+        return count < 2
       },
       refetchOnWindowFocus: false,
     },
@@ -108,7 +108,6 @@ function AppRoutes() {
 
 function AppInit() {
   const [ready, setReady] = useState(false)
-  const maintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
   useEffect(() => {
     let cancelled = false
@@ -147,7 +146,7 @@ function AppInit() {
 }
 
 export default function App() {
-  if (maintenanceMode === 'true') {
+  if (maintenanceMode) {
     return (
       <ErrorBoundary>
         <Maintenance />
