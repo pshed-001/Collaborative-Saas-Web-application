@@ -16,7 +16,7 @@ maintenanceApp.use(cors({
 }))
 maintenanceApp.all("/{*splat}", (req, res) => {
     res.status(503).json({
-        success: false,
+        success: true,
         message: "Application is currently under maintenance."
     })
 })
