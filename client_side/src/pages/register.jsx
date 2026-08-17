@@ -21,9 +21,22 @@ const schema = z
     lastname: z.string().min(1, 'Last name is required'),
     username: z.string().min(3, 'Username must be at least 3 characters'),
     email: z.string().email('Please enter a valid email'),
-    password: z.string().min(10, 'Password must be at least 10 characters'),
-    confirmPassword: z.string().min(10, 'Please confirm your password'),
-  })
+  password: z
+    .string()
+    .min(10, 'Password must be at least 10 characters')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
+}),
+confirmPassword: z
+    .string()
+    .min(10, 'Password must be at least 10 characters')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
+})
   .refine((d) => d.password === d.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
