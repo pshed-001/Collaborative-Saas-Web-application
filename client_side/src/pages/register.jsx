@@ -29,7 +29,7 @@ const schema = z
     .regex(/[0-9]/, 'Password must contain at least one number')
     .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
 }),
-confirmPassword: z
+    confirmPassword: z
     .string()
     .min(10, 'Password must be at least 10 characters')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
