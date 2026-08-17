@@ -39,6 +39,7 @@ const schema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
+ })
 
 export default function Register() {
   const navigate = useNavigate()
