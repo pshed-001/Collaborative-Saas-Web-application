@@ -54,10 +54,10 @@ app.use(globalLimiter)  // Global rate limit
 app.use("/api/auth", authRouter);
 app.use("/api/test", testRouter);
 app.use("/api/workspace", workspaceRouter);
-app.get("/{*splat}", (req, res) => {
+/*app.get("/{*splat}", (req, res) => {
     res.sendFile(path.join(__dirname, "../../client_side/index.html"))
 })
-
+*/
 
 app.use(errorhandler);
 
